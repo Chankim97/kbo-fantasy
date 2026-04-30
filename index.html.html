@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>⚾ KBO 판타지 리그 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0f1e;--bg2:#111827;--bg3:#1a2236;--bg4:#1f2d47;
+  --panel:#141e30;--line:#1e2e48;--line2:#2a3f60;
+  --snow:#e8edf8;--snow2:#b0bdd4;--snow3:#647a99;--snow4:#374d6a;
+  --blue:#3d8ef0;--cyan:#22d3ee;--green:#10c98c;--red:#f05252;
+  --amber:#f59e0b;--gold:#fbbf24;--purple:#a78bfa;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--snow);font-family:'Noto Sans KR',sans-serif}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* ── LOBBY ── */
+#lobby{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(61,142,240,.12) 0%,transparent 60%)}
+.logo-wrap{text-align:center;margin-bottom:40px}
+.logo-ball{font-size:56px;margin-bottom:8px;display:block;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.logo-title{font-family:'Black Han Sans',sans-serif;font-size:36px;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:13px;color:var(--snow3);margin-top:4px;letter-spacing:3px;text-transform:uppercase}
+
+.lobby-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:640px;width:100%}
+.lcard{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-lg);padding:24px;flex:1;min-width:280px;max-width:300px}
+.lcard-title{font-size:13px;color:var(--snow3);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.form-input{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r-md);padding:10px 14px;color:var(--snow);font-size:13px;font-family:'Noto Sans KR',sans-serif;width:100%;outline:none;margin-bottom:10px;transition:border-color .15s}
+.form-input:focus{border-color:var(--blue)}
+.emoji-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.emoji-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--line2);background:var(--bg3);cursor:pointer;font-size:18px;transition:all .15s}
+.emoji-btn.sel{border-color:var(--blue);background:rgba(61,142,240,.15)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;transition:all .15s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#1a6fd4);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-secondary{background:var(--bg4);color:var(--snow);border:1px solid var(--line2)}
+.btn-secondary:hover{border-color:var(--blue)}
+.btn-green{background:rgba(16,201,140,.15);color:var(--green);border:1px solid rgba(16,201,140,.3)}
+.btn-sm{padding:6px 14px;font-size:12px;width:auto}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.divider{height:1px;background:var(--line);margin:12px 0}
+.fb-info{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r-md);padding:10px 12px;font-size:11px;color:var(--amber);margin-bottom:10px}
+
+/* ── WAITING ROOM ── */
+#waiting{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.wait-box{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-lg);padding:28px;max-width:520px;width:100%;text-align:center}
+.code-display{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;letter-spacing:8px;color:var(--cyan);margin:16px 0;cursor:pointer}
+.code-display:hover{opacity:.8}
+.team-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;text-align:left}
+.team-slot{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;font-size:13px;display:flex;align-items:center;gap:8px}
+.team-slot.empty{color:var(--snow4);border-style:dashed}
+.team-slot.me{border-color:var(--blue)}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── DRAFT ── */
+#draft{flex-direction:row;height:100vh;overflow:hidden}
+.draft-left{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow-y:auto}
+.draft-center{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.draft-right{width:260px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--line);overflow-y:auto}
+
+.turn-banner{padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;display:flex;align-items:center;gap:8px}
+.my-turn{background:rgba(61,142,240,.1);color:var(--blue)}
+.their-turn{background:rgba(99,115,150,.07);color:var(--snow3)}
+.timer-bar{height:3px;background:var(--line2);position:relative;overflow:hidden}
+.timer-fill{height:100%;background:var(--blue);transition:width 1s linear;position:absolute;left:0}
+
+.filter-row{padding:8px 10px;border-bottom:1px solid var(--line);display:flex;gap:4px;flex-wrap:wrap}
+.fchip{padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--line2);color:var(--snow3);transition:all .15s;white-space:nowrap}
+.fchip:hover,.fchip.active{background:rgba(61,142,240,.15);color:var(--blue);border-color:var(--blue)}
+.search-bar{padding:6px 10px;border-bottom:1px solid var(--line)}
+.search-bar input{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r-md);padding:6px 10px;color:var(--snow);font-size:12px;font-family:'Noto Sans KR',sans-serif;width:100%;outline:none}
+
+.pool-wrap{flex:1;overflow-y:auto;padding:6px}
+.pool-grid{display:flex;flex-direction:column;gap:2px}
+.p-card{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s}
+.p-card:hover{border-color:var(--blue);background:rgba(61,142,240,.07)}
+.p-card.selected{border-color:var(--cyan);background:rgba(34,211,238,.08)}
+.p-card.top5{border-left:3px solid var(--gold)}
+.p-card.unavail{opacity:.3;pointer-events:none}
+.p-ava{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;letter-spacing:-.5px}
+.p-info{flex:1;min-width:0}
+.p-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-meta{font-size:10px;color:var(--snow3);display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap}
+.pos-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px}
+.pos-p{background:rgba(61,142,240,.2);color:#7cb8ff}
+.pos-c{background:rgba(245,166,35,.2);color:#fcd34d}
+.pos-if{background:rgba(240,82,82,.15);color:#fca5a5}
+.pos-of{background:rgba(16,201,140,.2);color:#6ee7b7}
+.pos-ut{background:rgba(110,123,153,.15);color:#9ca3af}
+.adp-score{font-size:9px;color:var(--snow4);font-family:'JetBrains Mono',monospace}
+.p-stat{font-size:10px;color:var(--snow4);flex-shrink:0}
+.foreign-badge{font-size:9px;background:rgba(167,139,250,.2);color:#c4b5fd;padding:1px 5px;border-radius:3px}
+
+.confirm-bar{padding:10px;border-top:1px solid var(--line);background:var(--bg2)}
+.sel-card{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r-md);padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+
+/* ── ROSTER PANEL (LEFT) ── */
+.roster-title{padding:10px 12px;font-size:11px;color:var(--snow3);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--line)}
+.r-slot{padding:6px 10px;border-bottom:1px solid rgba(30,46,72,.5);display:flex;align-items:center;gap:6px;font-size:11px}
+.r-pos{font-size:9px;font-weight:700;width:28px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.r-name{flex:1;font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-team-tag{font-size:9px;color:var(--snow4)}
+.r-slot.filled{background:rgba(16,201,140,.04)}
+
+/* ── LOG / TEAMS PANEL (RIGHT) ── */
+.rtab{display:flex;border-bottom:1px solid var(--line)}
+.rtab-item{flex:1;padding:8px;text-align:center;font-size:11px;color:var(--snow3);cursor:pointer;border-bottom:2px solid transparent}
+.rtab-item.active{color:var(--blue);border-bottom-color:var(--blue)}
+.rp-content{padding:6px}
+.log-item{padding:6px 8px;border-radius:6px;margin-bottom:3px;font-size:11px;background:var(--bg3)}
+.log-pick{color:var(--snow2)}
+.log-mine{background:rgba(61,142,240,.1);color:var(--blue)}
+.order-strip{padding:6px 10px;border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto}
+.order-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;border:2px solid transparent;font-weight:600}
+.order-dot.cur{border-color:var(--cyan);animation:pulse .6s infinite}
+.order-dot.done{opacity:.3}
+
+/* ── SEASON ── */
+#season{flex-direction:column;min-height:100vh}
+.season-nav{background:var(--bg2);border-bottom:1px solid var(--line);padding:0;display:flex;align-items:stretch}
+.season-logo{font-family:'Black Han Sans',sans-serif;font-size:16px;padding:0 20px;display:flex;align-items:center;gap:8px;color:var(--cyan)}
+.snav-item{padding:12px 16px;font-size:12px;color:var(--snow3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.snav-item:hover{color:var(--snow)}
+.snav-item.active{color:var(--blue);border-bottom-color:var(--blue)}
+.snav-right{margin-left:auto;display:flex;align-items:center;padding:0 16px;gap:8px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse .8s infinite}
+.season-content{flex:1;padding:24px;max-width:1080px;margin:0 auto;width:100%}
+.spage{display:none}.spage.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.card-title{font-size:11px;color:var(--snow3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{background:var(--bg3);border-radius:var(--r-md);padding:14px;text-align:center}
+.metric-v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700}
+.metric-l{font-size:11px;color:var(--snow3);margin-top:3px}
+
+/* ── STANDINGS TABLE ── */
+.standings-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.standings-tbl th{padding:8px 12px;color:var(--snow3);font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--line);font-weight:500;text-align:left}
+.standings-tbl td{padding:9px 12px;border-bottom:1px solid rgba(30,46,72,.4);vertical-align:middle}
+.standings-tbl tr:last-child td{border-bottom:none}
+.standings-tbl tr.me td{background:rgba(61,142,240,.05)}
+.standings-tbl tr:hover td{background:rgba(255,255,255,.02)}
+.rank-change{font-size:10px;font-family:'JetBrains Mono',monospace;margin-left:4px}
+.rank-up{color:var(--green)}.rank-dn{color:var(--red)}.rank-eq{color:var(--snow4)}
+
+/* ── RANK HISTORY CHART ── */
+.chart-wrap{position:relative;height:180px;margin-top:8px}
+canvas{width:100%!important}
+
+/* ── NOTIF ── */
+.notif{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:var(--panel);border:1px solid var(--green);border-radius:var(--r-md);padding:9px 18px;font-size:13px;color:var(--green);z-index:1000;transition:transform .3s;white-space:nowrap;pointer-events:none}
+.notif.show{transform:translateX(-50%) translateY(0)}
+.notif.err{border-color:var(--red);color:var(--red)}
+.notif.info{border-color:var(--blue);color:var(--blue)}
+.notif.warn{border-color:var(--amber);color:var(--amber)}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r-lg);padding:24px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-title{font-family:'Black Han Sans',sans-serif;font-size:20px;margin-bottom:16px}
+
+/* 반응형 */
+@media(max-width:768px){
+  .draft-left,.draft-right{display:none}
+  .draft-center{width:100%}
+  .lobby-cards{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOBBY ═══════════ -->
+<div class="screen active" id="lobby">
+  <span class="logo-ball">⚾</span>
+  <div class="logo-wrap">
+    <div class="logo-title">KBO 판타지 리그</div>
+    <div class="logo-sub">2026 멀티플레이어</div>
+  </div>
+  <div class="lobby-cards">
+    <!-- 리그 만들기 -->
+    <div class="lcard">
+      <div class="lcard-title">🏟️ 리그 만들기</div>
+      <input class="form-input" id="create-name" placeholder="내 팀 이름" maxlength="12">
+      <div style="font-size:11px;color:var(--snow3);margin-bottom:6px">팀 이모지</div>
+      <div class="emoji-row" id="create-emoji-row">
+        💙 ❤️ 💚 💛 💜 🩷 🔥 ⚡
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:11px;color:var(--snow3);margin-bottom:6px">리그 설정</div>
+      <select class="form-input" id="create-teams" style="height:36px;cursor:pointer">
+        <option value="2">2팀 (테스트)</option>
+        <option value="4">4팀</option>
+        <option value="6" selected>6팀</option>
+        <option value="8">8팀</option>
+        <option value="10">10팀</option>
+      </select>
+      <input class="form-input" id="create-stats-url" placeholder="GitHub Stats URL (선택)" style="font-size:11px">
+      <button class="btn btn-primary" onclick="handleCreate()">리그 만들기 →</button>
+    </div>
+
+    <!-- 리그 참가 -->
+    <div class="lcard">
+      <div class="lcard-title">🚀 리그 참가</div>
+      <input class="form-input" id="join-code" placeholder="초대 코드 6자리" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-family:'JetBrains Mono',monospace;font-size:18px;text-align:center">
+      <input class="form-input" id="join-name" placeholder="내 팀 이름" maxlength="12">
+      <div class="emoji-row" id="join-emoji-row">
+        💙 ❤️ 💚 💛 💜 🩷 🔥 ⚡
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-secondary" onclick="handleJoin()">참가하기 →</button>
+      <div style="height:10px"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ WAITING ROOM ═══════════ -->
+<div class="screen" id="waiting">
+  <div class="wait-box">
+    <div style="font-size:13px;color:var(--snow3);margin-bottom:4px">리그 초대 코드</div>
+    <div class="code-display" id="wait-code" onclick="copyCode()" title="클릭해서 복사">——</div>
+    <div style="font-size:12px;color:var(--snow3);margin-bottom:16px">이 코드를 친구들에게 공유하세요</div>
+    <div style="font-size:11px;color:var(--snow3);margin-bottom:8px">참가 현황 <span id="wait-count">0</span>/<span id="wait-max">6</span></div>
+    <div class="team-slots" id="wait-teams"></div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primary" id="start-draft-btn" onclick="hostStartDraft()" style="display:none">드래프트 시작 →</button>
+      <div id="wait-status" style="font-size:12px;color:var(--snow3);text-align:center">방장이 드래프트를 시작할 때까지 대기 중...</div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="showScreen('lobby')" style="margin-top:12px;width:auto">← 나가기</button>
+  </div>
+</div>
+
+<!-- ═══════════ DRAFT ═══════════ -->
+<div class="screen" id="draft">
+  <!-- 왼쪽: 내 로스터 -->
+  <div class="draft-left">
+    <div class="roster-title">내 로스터 <span id="my-picks-count" style="font-family:'JetBrains Mono',monospace;color:var(--cyan)">0</span>/25</div>
+    <div id="my-roster-list"></div>
+  </div>
+
+  <!-- 중앙: 선수 풀 -->
+  <div class="draft-center">
+    <div class="turn-banner their-turn" id="turn-banner">
+      <div id="turn-text">드래프트 시작 중...</div>
+      <div id="turn-round" style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--snow4)"></div>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="filter-row" id="filter-row">
+      <div class="fchip active" onclick="setFilter('ALL',this)">전체</div>
+      <div class="fchip" onclick="setFilter('P',this)">투수</div>
+      <div class="fchip" onclick="setFilter('C',this)">포수</div>
+      <div class="fchip" onclick="setFilter('1B',this)">1루</div>
+      <div class="fchip" onclick="setFilter('2B',this)">2루</div>
+      <div class="fchip" onclick="setFilter('3B',this)">3루</div>
+      <div class="fchip" onclick="setFilter('SS',this)">유격</div>
+      <div class="fchip" onclick="setFilter('IF',this)">내야↑</div>
+      <div class="fchip" onclick="setFilter('LF',this)">좌익</div>
+      <div class="fchip" onclick="setFilter('CF',this)">중견</div>
+      <div class="fchip" onclick="setFilter('RF',this)">우익</div>
+      <div class="fchip" onclick="setFilter('OF',this)">외야↑</div>
+      <div class="fchip" onclick="setFilter('FOREIGN',this)">외국인</div>
+      <div id="show-picked-btn" class="fchip" onclick="toggleShowPicked()" style="border-color:rgba(240,82,82,.4);color:var(--red)">지명선수 보기</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="선수 이름 / 팀명 검색..." id="search-input" oninput="renderPool()">
+    </div>
+    <div class="pool-wrap"><div class="pool-grid" id="pool-grid"></div></div>
+    <div class="confirm-bar" id="confirm-bar">
+      <div class="sel-card" id="sel-display" style="display:none"></div>
+      <button class="btn btn-primary" id="confirm-btn" onclick="confirmPick()" disabled>지명 확정</button>
+    </div>
+  </div>
+
+  <!-- 오른쪽: 로그/팀 -->
+  <div class="draft-right">
+    <div class="order-strip" id="order-strip"></div>
+    <div class="rtab">
+      <div class="rtab-item active" onclick="setRpTab('log',this)">픽 로그</div>
+      <div class="rtab-item" onclick="setRpTab('teams',this)">팀 현황</div>
+    </div>
+    <div class="rp-content" id="rp-log-content"></div>
+    <div class="rp-content" id="rp-teams-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SEASON ═══════════ -->
+<div class="screen" id="season">
+  <div class="season-nav">
+    <div class="season-logo">⚾ KBO 판타지</div>
+    <div class="snav-item active" onclick="seasonNav('standings',this)">🏆 순위표</div>
+    <div class="snav-item" onclick="seasonNav('roster',this)">👥 내 로스터</div>
+    <div class="snav-item" onclick="seasonNav('scores',this)">📊 점수</div>
+    <div class="snav-item" onclick="seasonNav('history',this)">📈 순위 변동</div>
+    <div class="snav-right">
+      <div class="live-dot" id="live-dot" style="display:none"></div>
+      <button class="btn btn-secondary btn-sm" onclick="refreshStandings()">🔄 갱신</button>
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('lobby')">나가기</button>
+    </div>
+  </div>
+  <div class="season-content">
+    <!-- 순위표 -->
+    <div class="spage active" id="sp-standings">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:'Black Han Sans',sans-serif;font-size:22px" id="standings-title">순위표</div>
+          <div style="font-size:12px;color:var(--snow3)" id="standings-sub">로티세리 방식 · 카테고리 순위 합산</div>
+        </div>
+        <div id="last-update-tag" style="font-size:11px;color:var(--snow4)"></div>
+      </div>
+      <div id="standings-hitter" class="card" style="margin-bottom:14px;overflow-x:auto"></div>
+      <div id="standings-pitcher" class="card" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- 로스터 -->
+    <div class="spage" id="sp-roster">
+      <div style="font-family:'Black Han Sans',sans-serif;font-size:22px;margin-bottom:16px">내 로스터</div>
+      <div id="roster-content"></div>
+    </div>
+
+    <!-- 점수 -->
+    <div class="spage" id="sp-scores">
+      <div style="font-family:'Black Han Sans',sans-serif;font-size:22px;margin-bottom:16px">점수 현황</div>
+      <div id="scores-content"></div>
+    </div>
+
+    <!-- 순위 변동 -->
+    <div class="spage" id="sp-history">
+      <div style="font-family:'Black Han Sans',sans-serif;font-size:22px;margin-bottom:16px">📈 순위 변동</div>
+      <div class="card">
+        <div class="chart-wrap"><canvas id="rank-chart"></canvas></div>
+      </div>
+      <div id="history-table" class="card" style="margin-top:14px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal (간소화) -->
+<div class="modal-bg" id="settings-modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">⚙️ 설정</div>
+    <div style="font-size:12px;color:var(--snow3);margin-bottom:12px">
+      Firebase는 이미 연결되어 있습니다. GitHub Stats URL만 변경 가능합니다.
+    </div>
+    <label style="font-size:11px;color:var(--snow3);display:block;margin-bottom:4px">KBO 스탯 URL (변경 불필요)</label>
+    <input class="form-input" id="fb-stats-url" value="https://raw.githubusercontent.com/Chankim97/kbo-fantasy/main/data/stats_latest.json" style="font-size:11px">
+    <button class="btn btn-primary" onclick="closeModal()">확인</button>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// PLAYER DATA (PLAYERS_RAW → 아래 실제 데이터로 교체됨)
+// ═══════════════════════════════════════════════════════════════════
+</script>
+<script>
+const PLAYERS_RAW = [
+  {name:'권우준',team:'LG',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'김강률',team:'LG',pos:'P',positions:["P"],no:37,foreign:false},
+  {name:'김동현',team:'LG',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'김대현',team:'LG',pos:'P',positions:["P"],no:12,foreign:false},
+  {name:'김영우',team:'LG',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'김유영',team:'LG',pos:'P',positions:["P"],no:0,foreign:false},
+  {name:'김주온',team:'LG',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'김진성',team:'LG',pos:'P',positions:["P"],no:42,foreign:false},
+  {name:'김진수',team:'LG',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'박명근',team:'LG',pos:'P',positions:["P"],no:39,foreign:false},
+  {name:'박시원',team:'LG',pos:'P',positions:["P"],no:58,foreign:false},
+  {name:'박준성',team:'LG',pos:'P',positions:["P"],no:59,foreign:false},
+  {name:'배재준',team:'LG',pos:'P',positions:["P"],no:25,foreign:false},
+  {name:'백승현',team:'LG',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'성동현',team:'LG',pos:'P',positions:["P"],no:34,foreign:false},
+  {name:'손주영',team:'LG',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'송승기',team:'LG',pos:'P',positions:["P"],no:13,foreign:false},
+  {name:'양우진',team:'LG',pos:'P',positions:["P"],no:65,foreign:false},
+  {name:'우강훈',team:'LG',pos:'P',positions:["P"],no:20,foreign:false},
+  {name:'우명현',team:'LG',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'웰스',team:'LG',pos:'P',positions:["P"],no:68,foreign:true},
+  {name:'유영찬',team:'LG',pos:'P',positions:["P"],no:54,foreign:false},
+  {name:'이민호',team:'LG',pos:'P',positions:["P"],no:26,foreign:false},
+  {name:'이우찬',team:'LG',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'이정용',team:'LG',pos:'P',positions:["P"],no:31,foreign:false},
+  {name:'이지강',team:'LG',pos:'P',positions:["P"],no:32,foreign:false},
+  {name:'임찬규',team:'LG',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'장시환',team:'LG',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'장현식',team:'LG',pos:'P',positions:["P"],no:50,foreign:false},
+  {name:'정우영',team:'LG',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'조원태',team:'LG',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'조건희',team:'LG',pos:'P',positions:["P"],no:48,foreign:false},
+  {name:'최지명',team:'LG',pos:'P',positions:["P"],no:16,foreign:false},
+  {name:'치리노스',team:'LG',pos:'P',positions:["P"],no:46,foreign:true},
+  {name:'톨허스트',team:'LG',pos:'P',positions:["P"],no:30,foreign:true},
+  {name:'함덕주',team:'LG',pos:'P',positions:["P"],no:11,foreign:false},
+  {name:'김민수',team:'LG',pos:'C',positions:["C"],no:62,foreign:false},
+  {name:'김준태',team:'LG',pos:'C',positions:["C"],no:44,foreign:false},
+  {name:'박동원',team:'LG',pos:'C',positions:["C"],no:27,foreign:false},
+  {name:'이주헌',team:'LG',pos:'C',positions:["C"],no:63,foreign:false},
+  {name:'구본혁',team:'LG',pos:'SS',positions:["SS", "2B", "3B"],no:6,foreign:false},
+  {name:'김성진',team:'LG',pos:'IF',positions:["IF"],no:36,foreign:false},
+  {name:'김정율',team:'LG',pos:'IF',positions:["IF"],no:14,foreign:false},
+  {name:'문보경',team:'LG',pos:'3B',positions:["3B"],no:2,foreign:false},
+  {name:'문정빈',team:'LG',pos:'IF',positions:["IF"],no:56,foreign:false},
+  {name:'손용준',team:'LG',pos:'IF',positions:["IF"],no:15,foreign:false},
+  {name:'신민재',team:'LG',pos:'2B',positions:["2B"],no:4,foreign:false},
+  {name:'오스틴',team:'LG',pos:'1B',positions:["1B"],no:23,foreign:true},
+  {name:'오지환',team:'LG',pos:'SS',positions:["SS"],no:10,foreign:false},
+  {name:'이영빈',team:'LG',pos:'2B',positions:["2B", "SS"],no:7,foreign:false},
+  {name:'천성호',team:'LG',pos:'3B',positions:["3B", "2B", "LF"],no:53,foreign:false},
+  {name:'추세현',team:'LG',pos:'IF',positions:["IF"],no:35,foreign:false},
+  {name:'김주성',team:'LG',pos:'OF',positions:["OF"],no:5,foreign:false},
+  {name:'김현종',team:'LG',pos:'OF',positions:["OF"],no:66,foreign:false},
+  {name:'문성주',team:'LG',pos:'LF',positions:["LF"],no:8,foreign:false},
+  {name:'박관우',team:'LG',pos:'OF',positions:["OF"],no:64,foreign:false},
+  {name:'박해민',team:'LG',pos:'CF',positions:["CF"],no:17,foreign:false},
+  {name:'서영준',team:'LG',pos:'OF',positions:["OF"],no:60,foreign:false},
+  {name:'송찬의',team:'LG',pos:'OF',positions:["OF"],no:55,foreign:false},
+  {name:'이재원',team:'LG',pos:'LF',positions:["LF", "RF"],no:52,foreign:false},
+  {name:'최원영',team:'LG',pos:'RF',positions:["RF", "CF"],no:3,foreign:false},
+  {name:'함창건',team:'LG',pos:'OF',positions:["OF"],no:24,foreign:false},
+  {name:'홍창기',team:'LG',pos:'RF',positions:["RF"],no:51,foreign:false},
+  {name:'강건우',team:'한화',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'강재민',team:'한화',pos:'P',positions:["P"],no:55,foreign:false},
+  {name:'권민규',team:'한화',pos:'P',positions:["P"],no:64,foreign:false},
+  {name:'김도빈',team:'한화',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'김민우',team:'한화',pos:'P',positions:["P"],no:53,foreign:false},
+  {name:'김범준',team:'한화',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'김서현',team:'한화',pos:'P',positions:["P"],no:44,foreign:false},
+  {name:'김종수',team:'한화',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'류현진',team:'한화',pos:'P',positions:["P"],no:99,foreign:false},
+  {name:'문동주',team:'한화',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'박상원',team:'한화',pos:'P',positions:["P"],no:58,foreign:false},
+  {name:'박재규',team:'한화',pos:'P',positions:["P"],no:39,foreign:false},
+  {name:'박준영',team:'한화',pos:'P',positions:["P"],no:96,foreign:false},
+  {name:'배민서',team:'한화',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'엄상백',team:'한화',pos:'P',positions:["P"],no:11,foreign:false},
+  {name:'에르난데스',team:'한화',pos:'P',positions:["P"],no:12,foreign:true},
+  {name:'왕옌청',team:'한화',pos:'P',positions:["P"],no:19,foreign:true},
+  {name:'양수호',team:'한화',pos:'P',positions:["P"],no:47,foreign:false},
+  {name:'원종혁',team:'한화',pos:'P',positions:["P"],no:48,foreign:false},
+  {name:'윤산흠',team:'한화',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'이민우',team:'한화',pos:'P',positions:["P"],no:27,foreign:false},
+  {name:'이상규',team:'한화',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'정우주',team:'한화',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'정이황',team:'한화',pos:'P',positions:["P"],no:34,foreign:false},
+  {name:'조동욱',team:'한화',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'주현상',team:'한화',pos:'P',positions:["P"],no:66,foreign:false},
+  {name:'하동준',team:'한화',pos:'P',positions:["P"],no:97,foreign:false},
+  {name:'한서구',team:'한화',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'화이트',team:'한화',pos:'P',positions:["P"],no:24,foreign:true},
+  {name:'황준서',team:'한화',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'박상언',team:'한화',pos:'C',positions:["C"],no:42,foreign:false},
+  {name:'이재원',team:'한화',pos:'C',positions:["C"],no:20,foreign:false},
+  {name:'장규현',team:'한화',pos:'C',positions:["C"],no:32,foreign:false},
+  {name:'최재훈',team:'한화',pos:'C',positions:["C"],no:13,foreign:false},
+  {name:'허관회',team:'한화',pos:'C',positions:["C"],no:26,foreign:false},
+  {name:'허인서',team:'한화',pos:'C',positions:["C"],no:59,foreign:false},
+  {name:'강백호',team:'한화',pos:'1B',positions:["1B", "3B"],no:50,foreign:false},
+  {name:'권현규',team:'한화',pos:'IF',positions:["IF"],no:94,foreign:false},
+  {name:'노시환',team:'한화',pos:'3B',positions:["3B"],no:8,foreign:false},
+  {name:'박정현',team:'한화',pos:'2B',positions:["2B", "SS"],no:63,foreign:false},
+  {name:'배승수',team:'한화',pos:'IF',positions:["IF"],no:98,foreign:false},
+  {name:'심우준',team:'한화',pos:'SS',positions:["SS", "2B"],no:7,foreign:false},
+  {name:'이도윤',team:'한화',pos:'2B',positions:["2B", "3B"],no:5,foreign:false},
+  {name:'이승현',team:'한화',pos:'IF',positions:["IF"],no:60,foreign:false},
+  {name:'정민규',team:'한화',pos:'IF',positions:["IF"],no:2,foreign:false},
+  {name:'채은성',team:'한화',pos:'1B',positions:["1B"],no:22,foreign:false},
+  {name:'최원준',team:'한화',pos:'IF',positions:["IF"],no:3,foreign:false},
+  {name:'최유빈',team:'한화',pos:'IF',positions:["IF"],no:93,foreign:false},
+  {name:'하주석',team:'한화',pos:'2B',positions:["2B", "SS"],no:16,foreign:false},
+  {name:'한지윤',team:'한화',pos:'IF',positions:["IF"],no:36,foreign:false},
+  {name:'황영묵',team:'한화',pos:'SS',positions:["SS"],no:95,foreign:false},
+  {name:'권광민',team:'한화',pos:'OF',positions:["OF"],no:17,foreign:false},
+  {name:'김태연',team:'한화',pos:'RF',positions:["RF", "LF"],no:25,foreign:false},
+  {name:'문현빈',team:'한화',pos:'LF',positions:["LF", "CF"],no:51,foreign:false},
+  {name:'오재원',team:'한화',pos:'OF',positions:["OF"],no:54,foreign:false},
+  {name:'유로결',team:'한화',pos:'OF',positions:["OF"],no:33,foreign:false},
+  {name:'유민',team:'한화',pos:'OF',positions:["OF"],no:65,foreign:false},
+  {name:'이민재',team:'한화',pos:'OF',positions:["OF"],no:68,foreign:false},
+  {name:'이원석',team:'한화',pos:'RF',positions:["RF", "LF"],no:37,foreign:false},
+  {name:'이진영',team:'한화',pos:'OF',positions:["OF"],no:10,foreign:false},
+  {name:'임종찬',team:'한화',pos:'OF',positions:["OF"],no:9,foreign:false},
+  {name:'최인호',team:'한화',pos:'OF',positions:["OF"],no:41,foreign:false},
+  {name:'페라자',team:'한화',pos:'RF',positions:["RF"],no:30,foreign:true},
+  {name:'김건우',team:'SSG',pos:'P',positions:["P"],no:39,foreign:false},
+  {name:'김광현',team:'SSG',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'김민',team:'SSG',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'김민준',team:'SSG',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'김성민',team:'SSG',pos:'P',positions:["P"],no:11,foreign:false},
+  {name:'김택형',team:'SSG',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'노경은',team:'SSG',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'문승원',team:'SSG',pos:'P',positions:["P"],no:42,foreign:false},
+  {name:'박기호',team:'SSG',pos:'P',positions:["P"],no:66,foreign:false},
+  {name:'박시후',team:'SSG',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'박종훈',team:'SSG',pos:'P',positions:["P"],no:50,foreign:false},
+  {name:'백승건',team:'SSG',pos:'P',positions:["P"],no:59,foreign:false},
+  {name:'서진용',team:'SSG',pos:'P',positions:["P"],no:22,foreign:false},
+  {name:'신지환',team:'SSG',pos:'P',positions:["P"],no:60,foreign:false},
+  {name:'송영진',team:'SSG',pos:'P',positions:["P"],no:90,foreign:false},
+  {name:'이건욱',team:'SSG',pos:'P',positions:["P"],no:16,foreign:false},
+  {name:'이기순',team:'SSG',pos:'P',positions:["P"],no:4,foreign:false},
+  {name:'이로운',team:'SSG',pos:'P',positions:["P"],no:92,foreign:false},
+  {name:'윤태현',team:'SSG',pos:'P',positions:["P"],no:12,foreign:false},
+  {name:'장지훈',team:'SSG',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'전영준',team:'SSG',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'정동윤',team:'SSG',pos:'P',positions:["P"],no:51,foreign:false},
+  {name:'조병현',team:'SSG',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'조요한',team:'SSG',pos:'P',positions:["P"],no:98,foreign:false},
+  {name:'천범석',team:'SSG',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'최민준',team:'SSG',pos:'P',positions:["P"],no:30,foreign:false},
+  {name:'한두솔',team:'SSG',pos:'P',positions:["P"],no:34,foreign:false},
+  {name:'타케다',team:'SSG',pos:'P',positions:["P"],no:23,foreign:true},
+  {name:'베니지아노',team:'SSG',pos:'P',positions:["P"],no:41,foreign:true},
+  {name:'화이트',team:'SSG',pos:'P',positions:["P"],no:55,foreign:true},
+  {name:'김규민',team:'SSG',pos:'C',positions:["C"],no:44,foreign:false},
+  {name:'김민식',team:'SSG',pos:'C',positions:["C"],no:24,foreign:false},
+  {name:'신범수',team:'SSG',pos:'C',positions:["C"],no:25,foreign:false},
+  {name:'이율예',team:'SSG',pos:'C',positions:["C"],no:0,foreign:false},
+  {name:'이지영',team:'SSG',pos:'C',positions:["C"],no:56,foreign:false},
+  {name:'조형우',team:'SSG',pos:'C',positions:["C"],no:20,foreign:false},
+  {name:'고명준',team:'SSG',pos:'1B',positions:["1B"],no:18,foreign:false},
+  {name:'김성현',team:'SSG',pos:'IF',positions:["IF"],no:6,foreign:false},
+  {name:'김수윤',team:'SSG',pos:'IF',positions:["IF"],no:5,foreign:false},
+  {name:'김요셉',team:'SSG',pos:'IF',positions:["IF"],no:46,foreign:false},
+  {name:'김태윤',team:'SSG',pos:'IF',positions:["IF"],no:36,foreign:false},
+  {name:'문상준',team:'SSG',pos:'IF',positions:["IF"],no:53,foreign:false},
+  {name:'박성한',team:'SSG',pos:'SS',positions:["SS"],no:2,foreign:false},
+  {name:'석정우',team:'SSG',pos:'3B',positions:["3B", "2B"],no:52,foreign:false},
+  {name:'안상현',team:'SSG',pos:'1B',positions:["1B"],no:10,foreign:false},
+  {name:'정준재',team:'SSG',pos:'2B',positions:["2B", "3B", "SS"],no:3,foreign:false},
+  {name:'최윤석',team:'SSG',pos:'IF',positions:["IF"],no:65,foreign:false},
+  {name:'최  정',team:'SSG',pos:'IF',positions:["IF"],no:14,foreign:false},
+  {name:'현원회',team:'SSG',pos:'2B',positions:["2B"],no:8,foreign:false},
+  {name:'홍대인',team:'SSG',pos:'3B',positions:["3B", "LF"],no:97,foreign:false},
+  {name:'김성욱',team:'SSG',pos:'OF',positions:["OF"],no:31,foreign:false},
+  {name:'김재환',team:'SSG',pos:'LF',positions:["LF", "RF"],no:32,foreign:false},
+  {name:'김창평',team:'SSG',pos:'OF',positions:["OF"],no:64,foreign:false},
+  {name:'류효승',team:'SSG',pos:'OF',positions:["OF"],no:45,foreign:false},
+  {name:'박지환',team:'SSG',pos:'OF',positions:["OF"],no:93,foreign:false},
+  {name:'에레디아',team:'SSG',pos:'LF',positions:["LF", "CF"],no:27,foreign:true},
+  {name:'오태곤',team:'SSG',pos:'LF',positions:["LF"],no:37,foreign:false},
+  {name:'이승민',team:'SSG',pos:'OF',positions:["OF"],no:9,foreign:false},
+  {name:'이정범',team:'SSG',pos:'OF',positions:["OF"],no:33,foreign:false},
+  {name:'임근우',team:'SSG',pos:'OF',positions:["OF"],no:63,foreign:false},
+  {name:'장재율',team:'SSG',pos:'OF',positions:["OF"],no:49,foreign:false},
+  {name:'채현우',team:'SSG',pos:'RF',positions:["RF", "CF"],no:15,foreign:false},
+  {name:'최준우',team:'SSG',pos:'OF',positions:["OF"],no:7,foreign:false},
+  {name:'최지훈',team:'SSG',pos:'CF',positions:["CF"],no:54,foreign:false},
+  {name:'하재훈',team:'SSG',pos:'OF',positions:["OF"],no:13,foreign:false},
+  {name:'한유섬',team:'SSG',pos:'RF',positions:["RF", "LF"],no:35,foreign:false},
+  {name:'김대호',team:'삼성',pos:'P',positions:["P"],no:44,foreign:false},
+  {name:'김무신',team:'삼성',pos:'P',positions:["P"],no:48,foreign:false},
+  {name:'김상호',team:'삼성',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'김재윤',team:'삼성',pos:'P',positions:["P"],no:62,foreign:false},
+  {name:'김태훈(투)',team:'삼성',pos:'P',positions:["P"],no:27,foreign:false},
+  {name:'매닝',team:'삼성',pos:'P',positions:["P"],no:9,foreign:true},
+  {name:'미야지',team:'삼성',pos:'P',positions:["P"],no:15,foreign:true},
+  {name:'박용재',team:'삼성',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'배찬승',team:'삼성',pos:'P',positions:["P"],no:55,foreign:false},
+  {name:'백정현',team:'삼성',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'양창섭',team:'삼성',pos:'P',positions:["P"],no:42,foreign:false},
+  {name:'양현',team:'삼성',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'원태인',team:'삼성',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'육선엽',team:'삼성',pos:'P',positions:["P"],no:4,foreign:false},
+  {name:'이승민',team:'삼성',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'이승현(우)',team:'삼성',pos:'P',positions:["P"],no:26,foreign:false},
+  {name:'이승현(좌)',team:'삼성',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'이재익',team:'삼성',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'이재희',team:'삼성',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'이호범',team:'삼성',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'이호성',team:'삼성',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'임기영',team:'삼성',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'장찬희',team:'삼성',pos:'P',positions:["P"],no:60,foreign:false},
+  {name:'정민성',team:'삼성',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'정재훈',team:'삼성',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'최원태',team:'삼성',pos:'P',positions:["P"],no:20,foreign:false},
+  {name:'최지광',team:'삼성',pos:'P',positions:["P"],no:11,foreign:false},
+  {name:'최하늘',team:'삼성',pos:'P',positions:["P"],no:37,foreign:false},
+  {name:'홍원표',team:'삼성',pos:'P',positions:["P"],no:65,foreign:false},
+  {name:'후라도',team:'삼성',pos:'P',positions:["P"],no:75,foreign:true},
+  {name:'강민호',team:'삼성',pos:'C',positions:["C"],no:47,foreign:false},
+  {name:'김도환',team:'삼성',pos:'C',positions:["C"],no:24,foreign:false},
+  {name:'김재성',team:'삼성',pos:'C',positions:["C"],no:2,foreign:false},
+  {name:'박세혁',team:'삼성',pos:'C',positions:["C"],no:52,foreign:false},
+  {name:'박진우',team:'삼성',pos:'C',positions:["C"],no:12,foreign:false},
+  {name:'이병헌',team:'삼성',pos:'C',positions:["C"],no:23,foreign:false},
+  {name:'장승현',team:'삼성',pos:'C',positions:["C"],no:46,foreign:false},
+  {name:'김영웅',team:'삼성',pos:'IF',positions:["IF"],no:30,foreign:false},
+  {name:'김재상',team:'삼성',pos:'IF',positions:["IF"],no:14,foreign:false},
+  {name:'디아즈',team:'삼성',pos:'1B',positions:["1B"],no:0,foreign:true},
+  {name:'류지혁',team:'삼성',pos:'2B',positions:["2B", "SS"],no:16,foreign:false},
+  {name:'심재훈',team:'삼성',pos:'IF',positions:["IF"],no:6,foreign:false},
+  {name:'양우현',team:'삼성',pos:'3B',positions:["3B", "SS"],no:53,foreign:false},
+  {name:'이재현',team:'삼성',pos:'SS',positions:["SS", "2B"],no:7,foreign:false},
+  {name:'이창용',team:'삼성',pos:'IF',positions:["IF"],no:50,foreign:false},
+  {name:'이해승',team:'삼성',pos:'2B',positions:["2B"],no:3,foreign:false},
+  {name:'전병우',team:'삼성',pos:'1B',positions:["1B", "3B"],no:61,foreign:false},
+  {name:'차승준',team:'삼성',pos:'IF',positions:["IF"],no:35,foreign:false},
+  {name:'구자욱',team:'삼성',pos:'LF',positions:["LF", "RF"],no:5,foreign:false},
+  {name:'김성윤',team:'삼성',pos:'OF',positions:["OF"],no:39,foreign:false},
+  {name:'김재혁',team:'삼성',pos:'OF',positions:["OF"],no:8,foreign:false},
+  {name:'김지찬',team:'삼성',pos:'CF',positions:["CF"],no:58,foreign:false},
+  {name:'김태훈(타)',team:'삼성',pos:'OF',positions:["OF"],no:25,foreign:false},
+  {name:'김헌곤',team:'삼성',pos:'LF',positions:["LF"],no:32,foreign:false},
+  {name:'류승민',team:'삼성',pos:'OF',positions:["OF"],no:43,foreign:false},
+  {name:'박승규',team:'삼성',pos:'RF',positions:["RF", "CF"],no:66,foreign:false},
+  {name:'윤정빈',team:'삼성',pos:'OF',positions:["OF"],no:31,foreign:false},
+  {name:'이성규',team:'삼성',pos:'LF',positions:["LF", "RF"],no:13,foreign:false},
+  {name:'최형우',team:'삼성',pos:'RF',positions:["RF", "LF"],no:34,foreign:false},
+  {name:'함수호',team:'삼성',pos:'OF',positions:["OF"],no:40,foreign:false},
+  {name:'홍현빈',team:'삼성',pos:'OF',positions:["OF"],no:51,foreign:false},
+  {name:'구창모',team:'NC',pos:'P',positions:["P"],no:59,foreign:false},
+  {name:'김녹원',team:'NC',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'김영규',team:'NC',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'김재열',team:'NC',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'김진호',team:'NC',pos:'P',positions:["P"],no:54,foreign:false},
+  {name:'김태경',team:'NC',pos:'P',positions:["P"],no:60,foreign:false},
+  {name:'김태훈',team:'NC',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'류진욱',team:'NC',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'목지훈',team:'NC',pos:'P',positions:["P"],no:20,foreign:false},
+  {name:'박지한',team:'NC',pos:'P',positions:["P"],no:56,foreign:false},
+  {name:'배재환',team:'NC',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'손주환',team:'NC',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'신민혁',team:'NC',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'신영우',team:'NC',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'원종해',team:'NC',pos:'P',positions:["P"],no:63,foreign:false},
+  {name:'이세민',team:'NC',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'이재학',team:'NC',pos:'P',positions:["P"],no:51,foreign:false},
+  {name:'이준혁',team:'NC',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'임정호',team:'NC',pos:'P',positions:["P"],no:30,foreign:false},
+  {name:'임지민',team:'NC',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'정구범',team:'NC',pos:'P',positions:["P"],no:8,foreign:false},
+  {name:'전사민',team:'NC',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'조민석',team:'NC',pos:'P',positions:["P"],no:47,foreign:false},
+  {name:'최성영',team:'NC',pos:'P',positions:["P"],no:26,foreign:false},
+  {name:'최요한',team:'NC',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'최우석',team:'NC',pos:'P',positions:["P"],no:64,foreign:false},
+  {name:'하준영',team:'NC',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'라일리',team:'NC',pos:'P',positions:["P"],no:3,foreign:true},
+  {name:'테일러',team:'NC',pos:'P',positions:["P"],no:66,foreign:true},
+  {name:'토다',team:'NC',pos:'P',positions:["P"],no:11,foreign:true},
+  {name:'김정호',team:'NC',pos:'C',positions:["C"],no:42,foreign:false},
+  {name:'김형준',team:'NC',pos:'C',positions:["C"],no:25,foreign:false},
+  {name:'신민우',team:'NC',pos:'C',positions:["C"],no:62,foreign:false},
+  {name:'안중열',team:'NC',pos:'C',positions:["C"],no:22,foreign:false},
+  {name:'이희성',team:'NC',pos:'C',positions:["C"],no:32,foreign:false},
+  {name:'김건',team:'NC',pos:'IF',positions:["IF"],no:52,foreign:false},
+  {name:'김주원',team:'NC',pos:'SS',positions:["SS"],no:7,foreign:false},
+  {name:'김한별',team:'NC',pos:'IF',positions:["IF"],no:13,foreign:false},
+  {name:'김휘집',team:'NC',pos:'3B',positions:["3B", "1B"],no:44,foreign:false},
+  {name:'데이비슨',team:'NC',pos:'1B',positions:["1B"],no:24,foreign:true},
+  {name:'도태훈',team:'NC',pos:'IF',positions:["IF"],no:16,foreign:false},
+  {name:'박민우',team:'NC',pos:'2B',positions:["2B"],no:2,foreign:false},
+  {name:'서호철',team:'NC',pos:'3B',positions:["3B", "SS"],no:5,foreign:false},
+  {name:'신재인',team:'NC',pos:'2B',positions:["2B"],no:9,foreign:false},
+  {name:'오영수',team:'NC',pos:'1B',positions:["1B", "3B"],no:34,foreign:false},
+  {name:'오태양',team:'NC',pos:'SS',positions:["SS", "2B"],no:6,foreign:false},
+  {name:'윤준혁',team:'NC',pos:'IF',positions:["IF"],no:31,foreign:false},
+  {name:'최정원',team:'NC',pos:'CF',positions:["CF"],no:14,foreign:false},
+  {name:'한재환',team:'NC',pos:'IF',positions:["IF"],no:35,foreign:false},
+  {name:'허윤',team:'NC',pos:'3B',positions:["3B", "2B"],no:4,foreign:false},
+  {name:'홍종표',team:'NC',pos:'IF',positions:["IF"],no:10,foreign:false},
+  {name:'고승완',team:'NC',pos:'OF',positions:["OF"],no:58,foreign:false},
+  {name:'고준휘',team:'NC',pos:'OF',positions:["OF"],no:49,foreign:false},
+  {name:'권희동',team:'NC',pos:'OF',positions:["OF"],no:36,foreign:false},
+  {name:'박건우',team:'NC',pos:'RF',positions:["RF"],no:37,foreign:false},
+  {name:'박시원',team:'NC',pos:'OF',positions:["OF"],no:53,foreign:false},
+  {name:'오장한',team:'NC',pos:'OF',positions:["OF"],no:65,foreign:false},
+  {name:'이우성',team:'NC',pos:'LF',positions:["LF"],no:55,foreign:false},
+  {name:'천재환',team:'NC',pos:'CF',positions:["CF", "LF"],no:23,foreign:false},
+  {name:'한석현',team:'NC',pos:'LF',positions:["LF", "RF"],no:33,foreign:false},
+  {name:'강건',team:'KT',pos:'P',positions:["P"],no:99,foreign:false},
+  {name:'고영표',team:'KT',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'고준혁',team:'KT',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'권성준',team:'KT',pos:'P',positions:["P"],no:15,foreign:false},
+  {name:'김동현',team:'KT',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'김민수',team:'KT',pos:'P',positions:["P"],no:26,foreign:false},
+  {name:'김정운',team:'KT',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'문용익',team:'KT',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'박건우',team:'KT',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'박영현',team:'KT',pos:'P',positions:["P"],no:60,foreign:false},
+  {name:'박지훈',team:'KT',pos:'P',positions:["P"],no:66,foreign:false},
+  {name:'배제성',team:'KT',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'보쉴리',team:'KT',pos:'P',positions:["P"],no:36,foreign:true},
+  {name:'사우어',team:'KT',pos:'P',positions:["P"],no:32,foreign:true},
+  {name:'소형준',team:'KT',pos:'P',positions:["P"],no:30,foreign:false},
+  {name:'손동현',team:'KT',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'스기모토',team:'KT',pos:'P',positions:["P"],no:11,foreign:true},
+  {name:'오원석',team:'KT',pos:'P',positions:["P"],no:47,foreign:false},
+  {name:'우규민',team:'KT',pos:'P',positions:["P"],no:12,foreign:false},
+  {name:'원상현',team:'KT',pos:'P',positions:["P"],no:63,foreign:false},
+  {name:'이상동',team:'KT',pos:'P',positions:["P"],no:37,foreign:false},
+  {name:'이원재',team:'KT',pos:'P',positions:["P"],no:64,foreign:false},
+  {name:'이정현',team:'KT',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'이채호',team:'KT',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'임준형',team:'KT',pos:'P',positions:["P"],no:14,foreign:false},
+  {name:'전용주',team:'KT',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'조이현',team:'KT',pos:'P',positions:["P"],no:54,foreign:false},
+  {name:'주권',team:'KT',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'최동환',team:'KT',pos:'P',positions:["P"],no:16,foreign:false},
+  {name:'한승혁',team:'KT',pos:'P',positions:["P"],no:35,foreign:false},
+  {name:'한차현',team:'KT',pos:'P',positions:["P"],no:2,foreign:false},
+  {name:'강현우',team:'KT',pos:'C',positions:["C"],no:55,foreign:false},
+  {name:'김민석',team:'KT',pos:'C',positions:["C"],no:44,foreign:false},
+  {name:'장성우',team:'KT',pos:'C',positions:["C"],no:22,foreign:false},
+  {name:'조대현',team:'KT',pos:'C',positions:["C"],no:42,foreign:false},
+  {name:'한승택',team:'KT',pos:'C',positions:["C"],no:45,foreign:false},
+  {name:'강민성',team:'KT',pos:'IF',positions:["IF"],no:5,foreign:false},
+  {name:'권동진',team:'KT',pos:'1B',positions:["1B", "3B"],no:52,foreign:false},
+  {name:'김건휘',team:'KT',pos:'IF',positions:["IF"],no:97,foreign:false},
+  {name:'김상수',team:'KT',pos:'SS',positions:["SS", "2B"],no:7,foreign:false},
+  {name:'류현인',team:'KT',pos:'SS',positions:["SS", "2B"],no:9,foreign:false},
+  {name:'문상철',team:'KT',pos:'IF',positions:["IF"],no:24,foreign:false},
+  {name:'안인산',team:'KT',pos:'IF',positions:["IF"],no:50,foreign:false},
+  {name:'오서진',team:'KT',pos:'IF',positions:["IF"],no:25,foreign:false},
+  {name:'오윤석',team:'KT',pos:'2B',positions:["2B", "SS"],no:4,foreign:false},
+  {name:'이강민',team:'KT',pos:'SS',positions:["SS"],no:6,foreign:false},
+  {name:'임상우',team:'KT',pos:'IF',positions:["IF"],no:101,foreign:false},
+  {name:'장준원',team:'KT',pos:'IF',positions:["IF"],no:56,foreign:false},
+  {name:'허경민',team:'KT',pos:'3B',positions:["3B"],no:13,foreign:false},
+  {name:'힐리어드',team:'KT',pos:'LF',positions:["LF", "1B"],no:34,foreign:true},
+  {name:'김민혁',team:'KT',pos:'OF',positions:["OF"],no:53,foreign:false},
+  {name:'김현수',team:'KT',pos:'LF',positions:["LF", "RF"],no:10,foreign:false},
+  {name:'배정대',team:'KT',pos:'CF',positions:["CF", "RF"],no:27,foreign:false},
+  {name:'안치영',team:'KT',pos:'OF',positions:["OF"],no:8,foreign:false},
+  {name:'안현민',team:'KT',pos:'LF',positions:["LF", "RF"],no:23,foreign:false},
+  {name:'유준규',team:'KT',pos:'OF',positions:["OF"],no:67,foreign:false},
+  {name:'이재원',team:'KT',pos:'OF',positions:["OF"],no:105,foreign:false},
+  {name:'이정훈',team:'KT',pos:'LF',positions:["LF", "CF"],no:33,foreign:false},
+  {name:'장진혁',team:'KT',pos:'OF',positions:["OF"],no:51,foreign:false},
+  {name:'최성민',team:'KT',pos:'OF',positions:["OF"],no:31,foreign:false},
+  {name:'최원준',team:'KT',pos:'RF',positions:["RF", "CF"],no:3,foreign:false},
+  {name:'구승민',team:'롯데',pos:'P',positions:["P"],no:22,foreign:false},
+  {name:'김강현',team:'롯데',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'김상수',team:'롯데',pos:'P',positions:["P"],no:24,foreign:false},
+  {name:'김영준',team:'롯데',pos:'P',positions:["P"],no:35,foreign:false},
+  {name:'김원중',team:'롯데',pos:'P',positions:["P"],no:34,foreign:false},
+  {name:'김진욱',team:'롯데',pos:'P',positions:["P"],no:15,foreign:false},
+  {name:'나균안',team:'롯데',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'박세웅',team:'롯데',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'박세진',team:'롯데',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'박시영',team:'롯데',pos:'P',positions:["P"],no:62,foreign:false},
+  {name:'박정민',team:'롯데',pos:'P',positions:["P"],no:36,foreign:false},
+  {name:'박준우',team:'롯데',pos:'P',positions:["P"],no:58,foreign:false},
+  {name:'박진',team:'롯데',pos:'P',positions:["P"],no:44,foreign:false},
+  {name:'송재영',team:'롯데',pos:'P',positions:["P"],no:59,foreign:false},
+  {name:'신동건',team:'롯데',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'로드리게스',team:'롯데',pos:'P',positions:["P"],no:31,foreign:true},
+  {name:'윤성빈',team:'롯데',pos:'P',positions:["P"],no:55,foreign:false},
+  {name:'이민석',team:'롯데',pos:'P',positions:["P"],no:37,foreign:false},
+  {name:'이영재',team:'롯데',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'이준서',team:'롯데',pos:'P',positions:["P"],no:54,foreign:false},
+  {name:'이진하',team:'롯데',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'정성종',team:'롯데',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'정철원',team:'롯데',pos:'P',positions:["P"],no:65,foreign:false},
+  {name:'정현수',team:'롯데',pos:'P',positions:["P"],no:57,foreign:false},
+  {name:'비슬리',team:'롯데',pos:'P',positions:["P"],no:23,foreign:true},
+  {name:'최이준',team:'롯데',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'최준용',team:'롯데',pos:'P',positions:["P"],no:56,foreign:false},
+  {name:'최충연',team:'롯데',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'쿄야마',team:'롯데',pos:'P',positions:["P"],no:48,foreign:true},
+  {name:'한현희',team:'롯데',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'현도훈',team:'롯데',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'홍민기',team:'롯데',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'박재엽',team:'롯데',pos:'C',positions:["C"],no:26,foreign:false},
+  {name:'손성빈',team:'롯데',pos:'C',positions:["C"],no:28,foreign:false},
+  {name:'유강남',team:'롯데',pos:'C',positions:["C"],no:27,foreign:false},
+  {name:'정문혁',team:'롯데',pos:'C',positions:["C"],no:143,foreign:false},
+  {name:'정보근',team:'롯데',pos:'C',positions:["C"],no:42,foreign:false},
+  {name:'고승민',team:'롯데',pos:'2B',positions:["2B", "SS"],no:2,foreign:false},
+  {name:'김민성',team:'롯데',pos:'IF',positions:["IF"],no:16,foreign:false},
+  {name:'김세민',team:'롯데',pos:'IF',positions:["IF"],no:5,foreign:false},
+  {name:'나승엽',team:'롯데',pos:'IF',positions:["IF"],no:51,foreign:false},
+  {name:'노진혁',team:'롯데',pos:'1B',positions:["1B"],no:52,foreign:false},
+  {name:'박승욱',team:'롯데',pos:'IF',positions:["IF"],no:53,foreign:false},
+  {name:'박찬형',team:'롯데',pos:'IF',positions:["IF"],no:60,foreign:false},
+  {name:'이서준',team:'롯데',pos:'IF',positions:["IF"],no:63,foreign:false},
+  {name:'이태경',team:'롯데',pos:'IF',positions:["IF"],no:69,foreign:false},
+  {name:'이호준',team:'롯데',pos:'IF',positions:["IF"],no:30,foreign:false},
+  {name:'전민재',team:'롯데',pos:'IF',positions:["IF"],no:13,foreign:false},
+  {name:'최항',team:'롯데',pos:'IF',positions:["IF"],no:14,foreign:false},
+  {name:'한동희',team:'롯데',pos:'IF',positions:["IF"],no:25,foreign:false},
+  {name:'한태양',team:'롯데',pos:'IF',positions:["IF"],no:6,foreign:false},
+  {name:'김동혁',team:'롯데',pos:'OF',positions:["OF"],no:50,foreign:false},
+  {name:'김동현',team:'롯데',pos:'OF',positions:["OF"],no:64,foreign:false},
+  {name:'김한홀',team:'롯데',pos:'OF',positions:["OF"],no:95,foreign:false},
+  {name:'레이예스',team:'롯데',pos:'OF',positions:["OF"],no:29,foreign:true},
+  {name:'손호영',team:'롯데',pos:'OF',positions:["OF"],no:33,foreign:false},
+  {name:'신윤후',team:'롯데',pos:'OF',positions:["OF"],no:3,foreign:false},
+  {name:'윤동희',team:'롯데',pos:'RF',positions:["RF", "CF"],no:91,foreign:false},
+  {name:'장두성',team:'롯데',pos:'OF',positions:["OF"],no:7,foreign:false},
+  {name:'전준우',team:'롯데',pos:'1B',positions:["1B", "RF"],no:8,foreign:false},
+  {name:'조세진',team:'롯데',pos:'OF',positions:["OF"],no:12,foreign:false},
+  {name:'황성빈',team:'롯데',pos:'CF',positions:["CF", "LF"],no:0,foreign:false},
+  {name:'곽도규',team:'KIA',pos:'P',positions:["P"],no:0,foreign:false},
+  {name:'김건국',team:'KIA',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'김기훈',team:'KIA',pos:'P',positions:["P"],no:53,foreign:false},
+  {name:'김대유',team:'KIA',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'김도현',team:'KIA',pos:'P',positions:["P"],no:60,foreign:false},
+  {name:'김범수',team:'KIA',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'김사윤',team:'KIA',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'김시훈',team:'KIA',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'김정엽',team:'KIA',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'김태형',team:'KIA',pos:'P',positions:["P"],no:10,foreign:false},
+  {name:'김현수',team:'KIA',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'네일',team:'KIA',pos:'P',positions:["P"],no:40,foreign:true},
+  {name:'성영탁',team:'KIA',pos:'P',positions:["P"],no:65,foreign:false},
+  {name:'양현종',team:'KIA',pos:'P',positions:["P"],no:54,foreign:false},
+  {name:'올러',team:'KIA',pos:'P',positions:["P"],no:33,foreign:true},
+  {name:'유지성',team:'KIA',pos:'P',positions:["P"],no:4,foreign:false},
+  {name:'윤영철',team:'KIA',pos:'P',positions:["P"],no:13,foreign:false},
+  {name:'윤중현',team:'KIA',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'이도현',team:'KIA',pos:'P',positions:["P"],no:66,foreign:false},
+  {name:'이성원',team:'KIA',pos:'P',positions:["P"],no:58,foreign:false},
+  {name:'이의리',team:'KIA',pos:'P',positions:["P"],no:48,foreign:false},
+  {name:'이준영',team:'KIA',pos:'P',positions:["P"],no:20,foreign:false},
+  {name:'이태양',team:'KIA',pos:'P',positions:["P"],no:44,foreign:false},
+  {name:'이형범',team:'KIA',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'이호민',team:'KIA',pos:'P',positions:["P"],no:63,foreign:false},
+  {name:'장재혁',team:'KIA',pos:'P',positions:["P"],no:38,foreign:false},
+  {name:'전상현',team:'KIA',pos:'P',positions:["P"],no:51,foreign:false},
+  {name:'정찬화',team:'KIA',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'정해영',team:'KIA',pos:'P',positions:["P"],no:62,foreign:false},
+  {name:'조상우',team:'KIA',pos:'P',positions:["P"],no:11,foreign:false},
+  {name:'최지민',team:'KIA',pos:'P',positions:["P"],no:39,foreign:false},
+  {name:'한재승',team:'KIA',pos:'P',positions:["P"],no:55,foreign:false},
+  {name:'홍건희',team:'KIA',pos:'P',positions:["P"],no:52,foreign:false},
+  {name:'홍민규',team:'KIA',pos:'P',positions:["P"],no:67,foreign:false},
+  {name:'황동하',team:'KIA',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'김태군',team:'KIA',pos:'C',positions:["C"],no:42,foreign:false},
+  {name:'주효상',team:'KIA',pos:'C',positions:["C"],no:22,foreign:false},
+  {name:'한준수',team:'KIA',pos:'C',positions:["C"],no:25,foreign:false},
+  {name:'김규성',team:'KIA',pos:'2B',positions:["2B", "3B"],no:14,foreign:false},
+  {name:'김도영',team:'KIA',pos:'3B',positions:["3B"],no:5,foreign:false},
+  {name:'김선빈',team:'KIA',pos:'2B',positions:["2B"],no:3,foreign:false},
+  {name:'데일',team:'KIA',pos:'SS',positions:["SS"],no:32,foreign:true},
+  {name:'박민',team:'KIA',pos:'IF',positions:["IF"],no:2,foreign:false},
+  {name:'박상준',team:'KIA',pos:'1B',positions:["1B"],no:50,foreign:false},
+  {name:'변우혁',team:'KIA',pos:'IF',positions:["IF"],no:29,foreign:false},
+  {name:'오선우',team:'KIA',pos:'IF',positions:["IF"],no:56,foreign:false},
+  {name:'윤도현',team:'KIA',pos:'IF',positions:["IF"],no:16,foreign:false},
+  {name:'이호연',team:'KIA',pos:'IF',positions:["IF"],no:36,foreign:false},
+  {name:'정현창',team:'KIA',pos:'3B',positions:["3B", "2B"],no:12,foreign:false},
+  {name:'최정용',team:'KIA',pos:'IF',positions:["IF"],no:23,foreign:false},
+  {name:'황대인',team:'KIA',pos:'IF',positions:["IF"],no:34,foreign:false},
+  {name:'고종욱',team:'KIA',pos:'LF',positions:["LF", "CF"],no:57,foreign:false},
+  {name:'김민규',team:'KIA',pos:'OF',positions:["OF"],no:37,foreign:false},
+  {name:'김석환',team:'KIA',pos:'OF',positions:["OF"],no:35,foreign:false},
+  {name:'김호령',team:'KIA',pos:'CF',positions:["CF", "RF"],no:27,foreign:false},
+  {name:'나성범',team:'KIA',pos:'RF',positions:["RF"],no:47,foreign:false},
+  {name:'박재현',team:'KIA',pos:'RF',positions:["RF", "LF"],no:15,foreign:false},
+  {name:'박정우',team:'KIA',pos:'LF',positions:["LF", "CF"],no:1,foreign:false},
+  {name:'이창진',team:'KIA',pos:'OF',positions:["OF"],no:8,foreign:false},
+  {name:'정해원',team:'KIA',pos:'OF',positions:["OF"],no:9,foreign:false},
+  {name:'카스트로',team:'KIA',pos:'LF',positions:["LF"],no:26,foreign:true},
+  {name:'한승연',team:'KIA',pos:'OF',positions:["OF"],no:31,foreign:false},
+  {name:'곽빈',team:'두산',pos:'P',positions:["P"],no:47,foreign:false},
+  {name:'김명신',team:'두산',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'김민규',team:'두산',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'김유성',team:'두산',pos:'P',positions:["P"],no:55,foreign:false},
+  {name:'김정우',team:'두산',pos:'P',positions:["P"],no:16,foreign:false},
+  {name:'김지윤',team:'두산',pos:'P',positions:["P"],no:104,foreign:false},
+  {name:'김택연',team:'두산',pos:'P',positions:["P"],no:63,foreign:false},
+  {name:'김한중',team:'두산',pos:'P',positions:["P"],no:95,foreign:false},
+  {name:'김호준',team:'두산',pos:'P',positions:["P"],no:56,foreign:false},
+  {name:'박신지',team:'두산',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'박정수',team:'두산',pos:'P',positions:["P"],no:17,foreign:false},
+  {name:'박치국',team:'두산',pos:'P',positions:["P"],no:1,foreign:false},
+  {name:'서준오',team:'두산',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'양재훈',team:'두산',pos:'P',positions:["P"],no:30,foreign:false},
+  {name:'윤태호',team:'두산',pos:'P',positions:["P"],no:65,foreign:false},
+  {name:'이교훈',team:'두산',pos:'P',positions:["P"],no:36,foreign:false},
+  {name:'이병헌',team:'두산',pos:'P',positions:["P"],no:29,foreign:false},
+  {name:'이영하',team:'두산',pos:'P',positions:["P"],no:50,foreign:false},
+  {name:'이용찬',team:'두산',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'이주엽',team:'두산',pos:'P',positions:["P"],no:43,foreign:false},
+  {name:'이주호',team:'두산',pos:'P',positions:["P"],no:35,foreign:false},
+  {name:'잭로그',team:'두산',pos:'P',positions:["P"],no:39,foreign:true},
+  {name:'최민석',team:'두산',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'최승용',team:'두산',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'최우인',team:'두산',pos:'P',positions:["P"],no:101,foreign:false},
+  {name:'최원준',team:'두산',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'최종인',team:'두산',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'최주형',team:'두산',pos:'P',positions:["P"],no:15,foreign:false},
+  {name:'최준호',team:'두산',pos:'P',positions:["P"],no:59,foreign:false},
+  {name:'최지강',team:'두산',pos:'P',positions:["P"],no:42,foreign:false},
+  {name:'타무라',team:'두산',pos:'P',positions:["P"],no:18,foreign:true},
+  {name:'플렉센',team:'두산',pos:'P',positions:["P"],no:77,foreign:true},
+  {name:'김기연',team:'두산',pos:'C',positions:["C"],no:22,foreign:false},
+  {name:'류현준',team:'두산',pos:'C',positions:["C"],no:67,foreign:false},
+  {name:'박민준',team:'두산',pos:'C',positions:["C"],no:26,foreign:false},
+  {name:'양의지',team:'두산',pos:'C',positions:["C"],no:25,foreign:false},
+  {name:'윤준호',team:'두산',pos:'C',positions:["C"],no:27,foreign:false},
+  {name:'강승호',team:'두산',pos:'3B',positions:["3B", "LF"],no:23,foreign:false},
+  {name:'김동준',team:'두산',pos:'IF',positions:["IF"],no:11,foreign:false},
+  {name:'김민혁',team:'두산',pos:'IF',positions:["IF"],no:10,foreign:false},
+  {name:'박계범',team:'두산',pos:'LF',positions:["LF", "RF"],no:14,foreign:false},
+  {name:'박준순',team:'두산',pos:'IF',positions:["IF"],no:52,foreign:false},
+  {name:'박지훈',team:'두산',pos:'IF',positions:["IF"],no:37,foreign:false},
+  {name:'박찬호',team:'두산',pos:'IF',positions:["IF"],no:7,foreign:false},
+  {name:'심건보',team:'두산',pos:'IF',positions:["IF"],no:117,foreign:false},
+  {name:'안재석',team:'두산',pos:'IF',positions:["IF"],no:62,foreign:false},
+  {name:'양석환',team:'두산',pos:'IF',positions:["IF"],no:53,foreign:false},
+  {name:'오명진',team:'두산',pos:'IF',positions:["IF"],no:6,foreign:false},
+  {name:'이유찬',team:'두산',pos:'IF',positions:["IF"],no:13,foreign:false},
+  {name:'임종성',team:'두산',pos:'IF',positions:["IF"],no:3,foreign:false},
+  {name:'김대한',team:'두산',pos:'OF',positions:["OF"],no:32,foreign:false},
+  {name:'김민석',team:'두산',pos:'OF',positions:["OF"],no:2,foreign:false},
+  {name:'김인태',team:'두산',pos:'CF',positions:["CF", "RF"],no:33,foreign:false},
+  {name:'김주오',team:'두산',pos:'OF',positions:["OF"],no:66,foreign:false},
+  {name:'신우열',team:'두산',pos:'OF',positions:["OF"],no:38,foreign:false},
+  {name:'전다민',team:'두산',pos:'OF',positions:["OF"],no:9,foreign:false},
+  {name:'정수빈',team:'두산',pos:'CF',positions:["CF"],no:31,foreign:false},
+  {name:'조수행',team:'두산',pos:'OF',positions:["OF"],no:51,foreign:false},
+  {name:'카메론',team:'두산',pos:'OF',positions:["OF"],no:24,foreign:true},
+  {name:'홍성호',team:'두산',pos:'OF',positions:["OF"],no:34,foreign:false},
+  {name:'김동규',team:'키움',pos:'P',positions:["P"],no:99,foreign:false},
+  {name:'김선기',team:'키움',pos:'P',positions:["P"],no:49,foreign:false},
+  {name:'김성민',team:'키움',pos:'P',positions:["P"],no:8,foreign:false},
+  {name:'김성진',team:'키움',pos:'P',positions:["P"],no:21,foreign:false},
+  {name:'김연주',team:'키움',pos:'P',positions:["P"],no:68,foreign:false},
+  {name:'김윤하',team:'키움',pos:'P',positions:["P"],no:19,foreign:false},
+  {name:'김재웅',team:'키움',pos:'P',positions:["P"],no:28,foreign:false},
+  {name:'박윤성',team:'키움',pos:'P',positions:["P"],no:35,foreign:false},
+  {name:'박정훈',team:'키움',pos:'P',positions:["P"],no:94,foreign:false},
+  {name:'박주성',team:'키움',pos:'P',positions:["P"],no:0,foreign:false},
+  {name:'박준현',team:'키움',pos:'P',positions:["P"],no:18,foreign:false},
+  {name:'박지성',team:'키움',pos:'P',positions:["P"],no:37,foreign:false},
+  {name:'박진형',team:'키움',pos:'P',positions:["P"],no:40,foreign:false},
+  {name:'배동현',team:'키움',pos:'P',positions:["P"],no:61,foreign:false},
+  {name:'안우진',team:'키움',pos:'P',positions:["P"],no:41,foreign:false},
+  {name:'알칸타라',team:'키움',pos:'P',positions:["P"],no:54,foreign:true},
+  {name:'오석주',team:'키움',pos:'P',positions:["P"],no:31,foreign:false},
+  {name:'와일스',team:'키움',pos:'P',positions:["P"],no:34,foreign:true},
+  {name:'원종현',team:'키움',pos:'P',positions:["P"],no:46,foreign:false},
+  {name:'유토',team:'키움',pos:'P',positions:["P"],no:48,foreign:true},
+  {name:'윤석원',team:'키움',pos:'P',positions:["P"],no:95,foreign:false},
+  {name:'이준우',team:'키움',pos:'P',positions:["P"],no:42,foreign:false},
+  {name:'이태양',team:'키움',pos:'P',positions:["P"],no:66,foreign:false},
+  {name:'임진묵',team:'키움',pos:'P',positions:["P"],no:69,foreign:false},
+  {name:'전준표',team:'키움',pos:'P',positions:["P"],no:62,foreign:false},
+  {name:'정다훈',team:'키움',pos:'P',positions:["P"],no:45,foreign:false},
+  {name:'정세영',team:'키움',pos:'P',positions:["P"],no:64,foreign:false},
+  {name:'정현우',team:'키움',pos:'P',positions:["P"],no:13,foreign:false},
+  {name:'조영건',team:'키움',pos:'P',positions:["P"],no:20,foreign:false},
+  {name:'하영민',team:'키움',pos:'P',positions:["P"],no:50,foreign:false},
+  {name:'김건희',team:'키움',pos:'C',positions:["C"],no:12,foreign:false},
+  {name:'김동헌',team:'키움',pos:'C',positions:["C"],no:44,foreign:false},
+  {name:'김재현',team:'키움',pos:'C',positions:["C"],no:32,foreign:false},
+  {name:'박성빈',team:'키움',pos:'C',positions:["C"],no:56,foreign:false},
+  {name:'김병휘',team:'키움',pos:'IF',positions:["IF"],no:23,foreign:false},
+  {name:'김웅빈',team:'키움',pos:'3B',positions:["3B"],no:10,foreign:false},
+  {name:'김지석',team:'키움',pos:'IF',positions:["IF"],no:26,foreign:false},
+  {name:'김태진',team:'키움',pos:'IF',positions:["IF"],no:1,foreign:false},
+  {name:'박한결',team:'키움',pos:'IF',positions:["IF"],no:4,foreign:false},
+  {name:'서건창',team:'키움',pos:'IF',positions:["IF"],no:14,foreign:false},
+  {name:'송지후',team:'키움',pos:'IF',positions:["IF"],no:86,foreign:false},
+  {name:'안치홍',team:'키움',pos:'IF',positions:["IF"],no:9,foreign:false},
+  {name:'양현종',team:'키움',pos:'IF',positions:["IF"],no:60,foreign:false},
+  {name:'어준서',team:'키움',pos:'IF',positions:["IF"],no:92,foreign:false},
+  {name:'여동욱',team:'키움',pos:'IF',positions:["IF"],no:93,foreign:false},
+  {name:'염승원',team:'키움',pos:'IF',positions:["IF"],no:39,foreign:false},
+  {name:'오선진',team:'키움',pos:'IF',positions:["IF"],no:6,foreign:false},
+  {name:'최주환',team:'키움',pos:'IF',positions:["IF"],no:53,foreign:false},
+  {name:'최재영',team:'키움',pos:'IF',positions:["IF"],no:38,foreign:false},
+  {name:'박수종',team:'키움',pos:'OF',positions:["OF"],no:87,foreign:false},
+  {name:'박주홍',team:'키움',pos:'OF',positions:["OF"],no:57,foreign:false},
+  {name:'박찬혁',team:'키움',pos:'OF',positions:["OF"],no:43,foreign:false},
+  {name:'브룩스',team:'키움',pos:'OF',positions:["OF"],no:22,foreign:true},
+  {name:'이용규',team:'키움',pos:'OF',positions:["OF"],no:15,foreign:false},
+  {name:'이주형',team:'키움',pos:'SS',positions:["SS", "2B"],no:2,foreign:false},
+  {name:'이형종',team:'키움',pos:'OF',positions:["OF"],no:36,foreign:false},
+  {name:'임병욱',team:'키움',pos:'OF',positions:["OF"],no:17,foreign:false},
+  {name:'임지열',team:'키움',pos:'OF',positions:["OF"],no:29,foreign:false},
+  {name:'주성원',team:'키움',pos:'OF',positions:["OF"],no:25,foreign:false},
+  {name:'추재현',team:'키움',pos:'OF',positions:["OF"],no:27,foreign:false}
+];
+</script>
+<script>
+
+// ═══════════════════════════════════════════════════════════════════
+// 상수
+// ═══════════════════════════════════════════════════════════════════
+const TEAM_ABBR = {'LG':'LG','한화':'한화','SSG':'SSG','삼성':'삼성','NC':'NC','KT':'KT','롯데':'롯데','KIA':'KIA','두산':'두산','키움':'키움'};
+const POS_KOR   = {P:'투수',C:'포수','1B':'1루수','2B':'2루수','3B':'3루수',SS:'유격수',LF:'좌익수',CF:'중견수',RF:'우익수',IF:'내야수',OF:'외야수'};
+const COMPAT    = {
+  P:['P'],C:['C'],
+  '1B':['1B','IF'],'2B':['2B','IF'],'3B':['3B','IF'],SS:['SS','IF'],
+  LF:['LF','OF'],CF:['CF','OF'],RF:['RF','OF'],
+  IF:['1B','2B','3B','SS','IF'],OF:['LF','CF','RF','OF'],
+  UT:['C','1B','2B','3B','SS','IF','LF','CF','RF','OF'],
+  BN:['P','C','1B','2B','3B','SS','IF','LF','CF','RF','OF'],
+};
+const SLOTS = [
+  {id:'p1',pos:'P',label:'투수1',group:'pitcher'},{id:'p2',pos:'P',label:'투수2',group:'pitcher'},
+  {id:'p3',pos:'P',label:'투수3',group:'pitcher'},{id:'p4',pos:'P',label:'투수4',group:'pitcher'},
+  {id:'p5',pos:'P',label:'투수5',group:'pitcher'},{id:'p6',pos:'P',label:'투수6',group:'pitcher'},
+  {id:'p7',pos:'P',label:'투수7',group:'pitcher'},{id:'p8',pos:'P',label:'투수8',group:'pitcher'},
+  {id:'p9',pos:'P',label:'투수9',group:'pitcher'},{id:'p10',pos:'P',label:'투수10',group:'pitcher'},
+  {id:'c1',pos:'C',label:'포수',group:'hitter'},
+  {id:'1b1',pos:'1B',label:'1루수',group:'hitter'},{id:'2b1',pos:'2B',label:'2루수',group:'hitter'},
+  {id:'3b1',pos:'3B',label:'3루수',group:'hitter'},{id:'ss1',pos:'SS',label:'유격수',group:'hitter'},
+  {id:'lf1',pos:'LF',label:'좌익수',group:'hitter'},{id:'cf1',pos:'CF',label:'중견수',group:'hitter'},
+  {id:'rf1',pos:'RF',label:'우익수',group:'hitter'},{id:'ut1',pos:'UT',label:'유틸',group:'hitter'},
+  {id:'bn1',pos:'BN',label:'벤치1',group:'bench'},{id:'bn2',pos:'BN',label:'벤치2',group:'bench'},
+  {id:'bn3',pos:'BN',label:'벤치3',group:'bench'},{id:'bn4',pos:'BN',label:'벤치4',group:'bench'},
+  {id:'bn5',pos:'BN',label:'벤치5',group:'bench'},{id:'bn6',pos:'BN',label:'벤치6',group:'bench'},
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// FIREBASE
+// ═══════════════════════════════════════════════════════════════════
+let FB = null;  // Firebase DB object
+let fbRef,fbSet,fbGet,fbOnValue,fbOff,fbUpdate,fbPush;
+
+// ── Firebase 설정 (하드코딩 — 링크만 공유하면 됩니다) ──────────────
+const FB_CONFIG = {
+  apiKey:      "AIzaSyCNU4epd64ogRe9EwMW0DF5BrodobZRfOU",
+  authDomain:  "kbo-fantasy-league.firebaseapp.com",
+  databaseURL: "https://kbo-fantasy-9922a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:   "kbo-fantasy-league",
+  appId:       "1:597435736476:web:1c1cfa902d07c1d3e2e859",
+};
+const DEFAULT_STATS_URL = "https://raw.githubusercontent.com/Chankim97/kbo-fantasy/main/data/stats_latest.json";
+
+function loadFbConfig() { return FB_CONFIG; }
+function saveFbConfig(cfg) {
+  // 하드코딩된 설정 사용 중 — 저장 불필요
+}
+
+async function initFB() {
+  if (FB) return true;
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getDatabase, ref, set, get, onValue, off, update, push }
+      = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const app = getApps().length ? getApps()[0] : initializeApp(FB_CONFIG);
+    FB = getDatabase(app);
+    fbRef=ref; fbSet=set; fbGet=get; fbOnValue=onValue; fbOff=off; fbUpdate=update; fbPush=push;
+    return true;
+  } catch(e) {
+    notify('연결 실패: ' + e.message, 'err');
+    return false;
+  }
+}
+
+const db = {
+  async get(path) {
+    const s = await fbGet(fbRef(FB, path));
+    return s.exists() ? s.val() : null;
+  },
+  async set(path, val) { await fbSet(fbRef(FB, path), val); },
+  async update(path, val) { await fbUpdate(fbRef(FB, path), val); },
+  listen(path, cb) {
+    const r = fbRef(FB, path);
+    fbOnValue(r, s => cb(s.val()));
+    return () => fbOff(r);
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// 앱 상태
+// ═══════════════════════════════════════════════════════════════════
+const A = {
+  userId:    localStorage.getItem('kbo_uid') || genId(8),
+  userName:  '',
+  userEmoji: '💙',
+  leagueId:  null,
+  isHost:    false,
+
+  // 드래프트 상태
+  draftInfo:  null,   // Firebase leagues/{id}/info 실시간
+  draftTeams: null,   // Firebase leagues/{id}/teams 실시간
+  draftPicks: {},     // 픽 기록
+  localRoster:{},     // 내 로스터 로컬 캐시
+  pickedIds:  new Set(),
+  selectedPlayer: null,
+  filter: 'ALL',
+  showPicked: false,
+  rpTab: 'log',
+  unsubscribes: [],
+
+  // 시즌 상태
+  stats: {},          // 실제 KBO 스탯
+  standings: null,
+  rankHistory: {},
+  statsUrl: DEFAULT_STATS_URL,
+
+  // 타이머
+  timerInterval: null,
+};
+localStorage.setItem('kbo_uid', A.userId);
+
+function genId(n=6){ return Math.random().toString(36).substr(2,n).toUpperCase(); }
+
+// ═══════════════════════════════════════════════════════════════════
+// 선수 데이터 + ADP
+// ═══════════════════════════════════════════════════════════════════
+let draftStats = {};
+
+function calcAdpScore(p) {
+  const key = p.name + '_' + p.team;
+  const st  = draftStats[key];
+  if (!st) return p.foreign ? 5 : 1;
+  if (st.type === 'hitter') {
+    return (st.r||0)*1.9 + (st.hr||0)*5 + (st.rbi||0)*1.9 + (st.sb||0)*4
+         + (st.avg||0)*200 + (st.ops||0)*100 + (st.bb||0);
+  } else {
+    const ip=st.ip||0, era=st.era||99;
+    return ip*2+(st.so||0)*2+(st.w||0)*8+(st.sv||0)*5+(st.hld||0)*4-(st.er||0)*2+(era<3&&ip>=5?10:0);
+  }
+}
+
+const PLAYERS = PLAYERS_RAW.map((p,i)=>({
+  ...p,
+  id: p.team+'_'+p.no+'_'+i,
+  adpScore: 0, rank: 0,
+  stat: POS_KOR[p.pos]||p.pos,
+  note: p.foreign ? '외국인' : '',
+}));
+
+function rebuildADP() {
+  PLAYERS.forEach(p => { p.adpScore = calcAdpScore(p); });
+  [...PLAYERS].sort((a,b)=>b.adpScore-a.adpScore).forEach((p,i)=>{ p.rank=i+1; });
+  PLAYERS.sort((a,b)=>a.rank-b.rank);
+}
+rebuildADP();
+
+async function loadDraftStats() {
+  try {
+    const url = DEFAULT_STATS_URL;
+    const r = await fetch(url+'?t='+Date.now(), {signal:AbortSignal.timeout(8000)});
+    if (r.ok) {
+      const d = await r.json();
+      if (d.players && Object.keys(d.players).length > 0) {
+        draftStats = d.players;
+        rebuildADP();
+        return Object.keys(draftStats).length;
+      }
+    }
+  } catch(e) {}
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UI 유틸
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+let notifTimer;
+function notify(msg, type='') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = 'notif show' + (type?' '+type:'');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+function closeModal() { document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('open')); }
+function showSettings() {
+  document.getElementById('settings-modal').classList.add('open');
+}
+function saveSettings() { closeModal(); }
+
+// 이모지 선택 UI
+function initEmojiRows() {
+  const emojis = ['💙','❤️','💚','💛','💜','🩷','🔥','⚡'];
+  ['create-emoji-row','join-emoji-row'].forEach(rowId => {
+    const row = document.getElementById(rowId);
+    row.innerHTML = '';
+    emojis.forEach((e,i) => {
+      const btn = document.createElement('button');
+      btn.className = 'emoji-btn' + (i===0?' sel':'');
+      btn.textContent = e;
+      btn.onclick = () => {
+        row.querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('sel'));
+        btn.classList.add('sel');
+      };
+      row.appendChild(btn);
+    });
+  });
+}
+initEmojiRows();
+
+function getSelectedEmoji(rowId) {
+  const sel = document.querySelector(`#${rowId} .emoji-btn.sel`);
+  return sel ? sel.textContent : '💙';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 리그 생성 / 참가
+// ═══════════════════════════════════════════════════════════════════
+async function handleCreate() {
+  if (!await initFB()) return;
+  const name  = document.getElementById('create-name').value.trim() || '내 팀';
+  const emoji = getSelectedEmoji('create-emoji-row');
+  const max   = parseInt(document.getElementById('create-teams').value);
+  const sUrl  = document.getElementById('create-stats-url').value.trim() || A.statsUrl;
+  A.userName = name; A.userEmoji = emoji;
+
+  const lid = genId(6);
+  await db.set(`leagues/${lid}`, {
+    info: {
+      name: name+'의 리그', maxTeams: max, scoring: 'roto',
+      statsUrl: sUrl, hostId: A.userId,
+      status: 'lobby', currentPickIdx: 0,
+      draftOrder: [], createdAt: Date.now(),
+    },
+    teams: {
+      [A.userId]: { name, userId:A.userId, emoji, color:'#3d8ef0', ready:true, isHost:true, roster:{} }
+    }
+  });
+
+  A.leagueId = lid; A.isHost = true;
+  enterWaiting(lid);
+}
+
+async function handleJoin() {
+  if (!await initFB()) return;
+  const lid  = document.getElementById('join-code').value.trim().toUpperCase();
+  const name = document.getElementById('join-name').value.trim() || '게스트';
+  const emoji= getSelectedEmoji('join-emoji-row');
+  if (lid.length !== 6) { notify('6자리 코드를 입력하세요', 'err'); return; }
+
+  const info = await db.get(`leagues/${lid}/info`);
+  if (!info) { notify('존재하지 않는 리그입니다', 'err'); return; }
+  if (info.status !== 'lobby') { notify('이미 드래프트가 시작된 리그입니다', 'err'); return; }
+
+  const teams = await db.get(`leagues/${lid}/teams`) || {};
+  if (Object.keys(teams).length >= info.maxTeams) { notify('인원이 가득 찼습니다', 'err'); return; }
+
+  A.userName = name; A.userEmoji = emoji; A.leagueId = lid; A.isHost = false;
+
+  const colors = ['#3d8ef0','#f05252','#10c98c','#f5a623','#a78bfa','#f472b6','#fb923c','#34d399'];
+  const takenColors = Object.values(teams).map(t=>t.color);
+  const color = colors.find(c=>!takenColors.includes(c))||colors[0];
+
+  await db.set(`leagues/${lid}/teams/${A.userId}`, {
+    name, userId:A.userId, emoji, color, ready:false, isHost:false, roster:{}
+  });
+  enterWaiting(lid);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 대기실
+// ═══════════════════════════════════════════════════════════════════
+function enterWaiting(lid) {
+  showScreen('waiting');
+  document.getElementById('wait-code').textContent = lid;
+
+  // 실시간 팀 목록 감시
+  const unsub = db.listen(`leagues/${lid}`, data => {
+    if (!data) return;
+    const {info, teams} = data;
+    renderWaitTeams(teams||{}, info);
+    if (info.status === 'drafting') {
+      cleanup();
+      enterDraft(data);
+    }
+  });
+  A.unsubscribes.push(unsub);
+}
+
+function renderWaitTeams(teams, info) {
+  const max = info.maxTeams;
+  const entries = Object.entries(teams);
+  const cnt = entries.length;
+  document.getElementById('wait-count').textContent = cnt;
+  document.getElementById('wait-max').textContent   = max;
+
+  let html = entries.map(([tid, t]) => `
+    <div class="team-slot ${tid===A.userId?'me':''}">
+      <div class="pulse-dot"></div>
+      <span style="font-size:16px">${t.emoji}</span>
+      <span>${t.name}${t.isHost?' 👑':''}</span>
+    </div>`).join('');
+  for(let i=cnt; i<max; i++) html += `<div class="team-slot empty">빈 자리</div>`;
+  document.getElementById('wait-teams').innerHTML = html;
+
+  const startBtn = document.getElementById('start-draft-btn');
+  const status   = document.getElementById('wait-status');
+  if (A.isHost) {
+    const minNeeded = info.maxTeams === 2 ? 1 : 2; // 2팀 모드는 혼자도 시작 가능 (봇 자동 추가)
+    startBtn.style.display = cnt >= minNeeded ? 'flex' : 'none';
+    if (info.maxTeams === 2 && cnt === 1) {
+      status.textContent = '2팀 테스트 모드 — 시작하면 AI 봇이 자동 참가합니다';
+      status.style.color = 'var(--cyan)';
+    } else {
+      status.textContent = cnt >= minNeeded ? '드래프트를 시작할 수 있습니다.' : `최소 ${minNeeded}팀 필요 (현재 ${cnt}팀)`;
+      status.style.color = '';
+    }
+  }
+}
+
+function copyCode() {
+  const code = document.getElementById('wait-code').textContent;
+  navigator.clipboard.writeText(code).then(()=>notify('코드 복사됨!'));
+}
+
+async function hostStartDraft() {
+  const info = await db.get(`leagues/${A.leagueId}/info`);
+  let teams = await db.get(`leagues/${A.leagueId}/teams`);
+  let teamIds = Object.keys(teams||{});
+
+  // 2팀 테스트 모드: 혼자면 AI 봇 자동 추가
+  if (info.maxTeams === 2 && teamIds.length === 1) {
+    const botId = 'BOT_' + genId(4);
+    const botEmojis = ['🤖','🦾','👾','🎯','🔥','⚡'];
+    const botNames  = ['AI 도전자','봇 감독','로봇 GM','자동 픽','컴퓨터'];
+    await db.set(`leagues/${A.leagueId}/teams/${botId}`, {
+      name:  botNames[Math.floor(Math.random()*botNames.length)],
+      userId: botId,
+      emoji:  botEmojis[Math.floor(Math.random()*botEmojis.length)],
+      color:  '#a78bfa',
+      ready:  true,
+      isHost: false,
+      isBot:  true,
+      roster: {},
+    });
+    teams = await db.get(`leagues/${A.leagueId}/teams`);
+    teamIds = Object.keys(teams||{});
+    notify('🤖 AI 봇이 자동 참가했습니다!', 'info');
+  }
+
+  // 스네이크 드래프트 순서
+  const shuffled = [...teamIds].sort(()=>Math.random()-.5);
+  const order = [];
+  for(let r=0;r<25;r++){
+    const row = [...shuffled]; if(r%2===1) row.reverse();
+    order.push(...row);
+  }
+  await db.update(`leagues/${A.leagueId}/info`, {
+    status:'drafting', draftOrder:order, currentPickIdx:0, draftStartedAt:Date.now()
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 드래프트
+// ═══════════════════════════════════════════════════════════════════
+function enterDraft(initialData) {
+  showScreen('draft');
+  // 스탯 로드 → ADP 재계산
+  loadDraftStats().then(cnt => {
+    if(cnt > 0) { notify(`📡 ${cnt}명 실제 스탯 로드 완료`, 'info'); renderPool(); }
+  });
+
+  A.localRoster = {};
+  A.pickedIds = new Set();
+  A.selectedPlayer = null;
+
+  // 실시간 감시
+  cleanup();
+  const unsub = db.listen(`leagues/${A.leagueId}`, data => {
+    if (!data) return;
+    A.draftInfo  = data.info;
+    A.draftTeams = data.teams || {};
+    A.draftPicks = data.picks || {};
+
+    // pickedIds 재구성
+    A.pickedIds = new Set(Object.values(A.draftPicks).map(p=>p.playerId));
+
+    // 내 로스터 업데이트
+    const myTeam = A.draftTeams[A.userId];
+    if (myTeam) A.localRoster = myTeam.roster || {};
+
+    renderAll_draft();
+
+    if (data.info.status === 'season') {
+      cleanup();
+      enterSeason();
+    }
+  });
+  A.unsubscribes.push(unsub);
+}
+
+function isMyTurn() {
+  if (!A.draftInfo) return false;
+  const {draftOrder, currentPickIdx} = A.draftInfo;
+  return draftOrder && draftOrder[currentPickIdx] === A.userId;
+}
+
+function currentRound() {
+  if (!A.draftInfo) return 1;
+  const {draftOrder, currentPickIdx} = A.draftInfo;
+  const n = Object.keys(A.draftTeams||{}).length || 1;
+  return Math.floor(currentPickIdx / n) + 1;
+}
+
+function renderAll_draft() {
+  renderOrderStrip();
+  renderMyRoster();
+  renderPool();
+  renderLog();
+  renderRpTeams();
+  renderTurnBanner();
+}
+
+function renderTurnBanner() {
+  const banner = document.getElementById('turn-banner');
+  const text   = document.getElementById('turn-text');
+  const round  = document.getElementById('turn-round');
+  if (!A.draftInfo) return;
+  const {draftOrder, currentPickIdx} = A.draftInfo;
+  const curTeamId = draftOrder?.[currentPickIdx];
+  const curTeam   = A.draftTeams?.[curTeamId];
+  const n = Object.keys(A.draftTeams||{}).length || 1;
+  const totalPicks = 25 * n;
+  round.textContent = `라운드 ${currentRound()} · ${currentPickIdx+1}/${totalPicks}`;
+
+  if (isMyTurn()) {
+    banner.className = 'turn-banner my-turn';
+    text.textContent = '🔔 내 차례입니다! 선수를 선택하세요';
+    startTimer(90);
+  } else {
+    banner.className = 'turn-banner their-turn';
+    text.textContent = curTeam ? `${curTeam.emoji} ${curTeam.name} 이(가) 선택 중...` : '대기 중...';
+    clearTimer();
+  }
+  // 확정 버튼
+  document.getElementById('confirm-btn').disabled = !isMyTurn() || !A.selectedPlayer;
+
+  // 봇 차례이면 자동 픽 (3~6초 딜레이로 자연스럽게)
+  if (!isMyTurn() && A.draftInfo) {
+    const curTeamId = A.draftInfo.draftOrder?.[A.draftInfo.currentPickIdx];
+    const curTeam   = A.draftTeams?.[curTeamId];
+    if (curTeam?.isBot && A.isHost) {  // 방장만 봇 픽 처리
+      const delay = 2000 + Math.random() * 4000;
+      setTimeout(() => doBotPick(curTeamId), delay);
+    }
+  }
+}
+
+// 타이머
+let timerSec = 90;
+function startTimer(sec) {
+  clearTimer();
+  timerSec = sec;
+  const fill = document.getElementById('timer-fill');
+  A.timerInterval = setInterval(() => {
+    timerSec--;
+    fill.style.width = Math.max(0, timerSec/sec*100) + '%';
+    fill.style.background = timerSec < 20 ? 'var(--red)' : timerSec < 40 ? 'var(--amber)' : 'var(--blue)';
+    if (timerSec <= 0) { clearTimer(); autoPickBest(); }
+  }, 1000);
+}
+function clearTimer() {
+  clearInterval(A.timerInterval);
+  document.getElementById('timer-fill').style.width = '100%';
+  document.getElementById('timer-fill').style.background = 'var(--blue)';
+}
+
+async function autoPickBest() {
+  if (!isMyTurn()) return;
+  const avail = PLAYERS.filter(p => !A.pickedIds.has(p.id) && findBestSlot(A.localRoster, p.pos, p.positions));
+  if (avail.length > 0) {
+    A.selectedPlayer = avail[0];
+    await confirmPick();
+    notify('⏰ 시간 초과 — 자동 지명', 'warn');
+  }
+}
+
+function renderOrderStrip() {
+  if (!A.draftInfo || !A.draftTeams) return;
+  const {draftOrder, currentPickIdx} = A.draftInfo;
+  if (!draftOrder) return;
+  const strip = document.getElementById('order-strip');
+  // 현재 픽 기준 앞뒤 5개씩만 표시
+  const start = Math.max(0, currentPickIdx - 3);
+  const end   = Math.min(draftOrder.length - 1, currentPickIdx + 8);
+  strip.innerHTML = draftOrder.slice(start, end+1).map((tid, i) => {
+    const realIdx = start + i;
+    const t = A.draftTeams[tid] || {};
+    const isCur = realIdx === currentPickIdx;
+    const isDone= realIdx < currentPickIdx;
+    const isMe  = tid === A.userId;
+    return `<div class="order-dot ${isCur?'cur':''} ${isDone?'done':''}"
+      style="background:${t.color||'var(--bg4)'};color:#fff;border-color:${isMe?'var(--cyan)':isCur?'var(--cyan)':'transparent'}"
+      title="${t.name||''} (${realIdx+1}번 픽)">${t.emoji||'?'}</div>`;
+  }).join('');
+}
+
+function renderMyRoster() {
+  const groups = [
+    {label:'투수', slots:SLOTS.filter(s=>s.group==='pitcher')},
+    {label:'타자', slots:SLOTS.filter(s=>s.group==='hitter')},
+    {label:'벤치', slots:SLOTS.filter(s=>s.group==='bench')},
+  ];
+  document.getElementById('my-picks-count').textContent = Object.keys(A.localRoster).length;
+  document.getElementById('my-roster-list').innerHTML = groups.map(g =>
+    `<div style="padding:4px 8px;font-size:10px;color:var(--snow4);text-transform:uppercase;letter-spacing:1px">${g.label}</div>` +
+    g.slots.map(s => {
+      const p = A.localRoster[s.id];
+      if (!p) return `<div class="r-slot"><span class="r-pos" style="color:var(--snow4)">${s.pos}</span><span class="r-name" style="color:var(--snow4)">—</span></div>`;
+      const color = getPosColor(p.pos);
+      return `<div class="r-slot filled"><span class="r-pos" style="color:${color}">${s.pos}</span><span class="r-name">${p.name}</span><span class="r-team-tag">${p.team}</span></div>`;
+    }).join('')
+  ).join('');
+}
+
+// ── 선수 풀 ────────────────────────────────────────────────────────
+function setFilter(f, el) {
+  A.filter = f;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderPool();
+}
+function toggleShowPicked() {
+  A.showPicked = !A.showPicked;
+  const btn = document.getElementById('show-picked-btn');
+  btn.textContent = A.showPicked ? '지명선수 숨기기' : '지명선수 보기';
+  btn.style.background = A.showPicked ? 'rgba(240,82,82,.15)' : '';
+  renderPool();
+}
+
+function renderPool() {
+  const f = A.filter;
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const myRosterObj = A.localRoster;
+
+  const avail = PLAYERS.filter(p => {
+    if (A.pickedIds.has(p.id) && !A.showPicked) return false;
+    // 외국인 제한 초과 시 숨김
+    if (p.foreign && !A.showPicked && !A.pickedIds.has(p.id)) {
+      if (isMyTurn()) {
+        const check = canPickForeign(myRosterObj, p.pos);
+        if (!check.ok) return false;
+      }
+    }
+    if (f !== 'ALL') {
+      const allPos = p.positions || [p.pos];
+      if (f==='P' && !allPos.includes('P')) return false;
+      else if (f==='C' && !allPos.includes('C')) return false;
+      else if (f==='1B' && !allPos.includes('1B')) return false;
+      else if (f==='2B' && !allPos.includes('2B')) return false;
+      else if (f==='3B' && !allPos.includes('3B')) return false;
+      else if (f==='SS' && !allPos.includes('SS')) return false;
+      else if (f==='IF' && !allPos.some(pp=>['1B','2B','3B','SS','IF'].includes(pp))) return false;
+      else if (f==='LF' && !allPos.includes('LF')) return false;
+      else if (f==='CF' && !allPos.includes('CF')) return false;
+      else if (f==='RF' && !allPos.includes('RF')) return false;
+      else if (f==='OF' && !allPos.some(pp=>['LF','CF','RF','OF'].includes(pp))) return false;
+      else if (f==='FOREIGN' && !p.foreign) return false;
+    }
+    if (q && !p.name.includes(q) && !p.team.includes(q)) return false;
+    return true;
+  });
+
+  const grid = document.getElementById('pool-grid');
+  grid.innerHTML = avail.map(p => {
+    const isPicked = A.pickedIds.has(p.id);
+    const isSel    = A.selectedPlayer?.id === p.id;
+    const isTop    = p.rank <= 5;
+    const pickedStyle = isPicked ? 'opacity:.3;pointer-events:none;' : '';
+    const st = draftStats[p.name+'_'+p.team];
+    const statStr = st ? (st.type==='hitter'
+      ? `AVG ${(st.avg||0).toFixed(3)} ${st.hr||0}HR ${st.rbi||0}RBI`
+      : `${(st.ip||0).toFixed(1)}IP ${st.era<99?(st.era||0).toFixed(2)+'ERA':''} ${st.so||0}K`)
+      : (p.adpScore < 2 ? '미출전' : '');
+    return `<div class="p-card ${isSel?'selected':''} ${isTop&&!isPicked?'top5':''}" style="${pickedStyle}" onclick="selectPlayer('${p.id}')">
+      <div class="p-ava" style="background:${getPosColor(p.pos)};color:${getPosTextColor(p.pos)};font-size:${p.team.length>2?'9px':'11px'}">${TEAM_ABBR[p.team]||p.team}</div>
+      <div class="p-info">
+        <div class="p-name">${p.name}${isPicked?'<span style="font-size:9px;color:var(--red);margin-left:4px">지명됨</span>':''}</div>
+        <div class="p-meta">
+          ${(p.positions||[p.pos]).map(pp=>`<span class="pos-tag ${getPosClass(pp)}">${pp}</span>`).join('')}
+          <span>${p.team}</span>
+          ${p.foreign?'<span class="foreign-badge">외국인</span>':''}
+          <span class="adp-score">#${p.rank}${statStr?' · '+statStr:''}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectPlayer(id) {
+  if (!isMyTurn()) { notify('내 차례가 아닙니다', 'err'); return; }
+  const p = PLAYERS.find(x=>x.id===id);
+  if (!p) return;
+  if (p.foreign) {
+    const check = canPickForeign(A.localRoster, p.pos);
+    if (!check.ok) { notify(check.msg, 'err'); return; }
+  }
+  if (!findBestSlot(A.localRoster, p.pos, p.positions)) { notify('배치 가능한 슬롯이 없습니다', 'err'); return; }
+  A.selectedPlayer = p;
+  renderPool();
+  renderSelDisplay();
+  document.getElementById('confirm-btn').disabled = false;
+}
+
+function renderSelDisplay() {
+  const p = A.selectedPlayer;
+  const el = document.getElementById('sel-display');
+  if (!p) { el.style.display='none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = `
+    <div class="p-ava" style="background:${getPosColor(p.pos)};color:${getPosTextColor(p.pos)};font-size:${p.team.length>2?'9px':'11px'}">${TEAM_ABBR[p.team]||p.team}</div>
+    <div class="p-info">
+      <div class="p-name">${p.name} ${(p.positions||[p.pos]).map(pp=>`<span class="pos-tag ${getPosClass(pp)}">${pp}</span>`).join('')}${p.foreign?'<span class="foreign-badge" style="margin-left:4px">외국인</span>':''}</div>
+      <div style="font-size:11px;color:var(--snow3)">${p.team} · ADP #${p.rank}</div>
+    </div>`;
+}
+
+
+// ── 봇 자동 픽 ────────────────────────────────────────────────────
+async function doBotPick(botTeamId) {
+  if (!A.draftInfo) return;
+  const curTeamId = A.draftInfo.draftOrder?.[A.draftInfo.currentPickIdx];
+  if (curTeamId !== botTeamId) return;  // 이미 다른 팀 차례
+
+  const botTeam   = A.draftTeams?.[botTeamId];
+  const botRoster = botTeam?.roster || {};
+
+  // ADP 순서대로 사용 가능한 선수 선택 (포지션 균형 고려)
+  const avail = PLAYERS.filter(p => {
+    if (A.pickedIds.has(p.id)) return false;
+    if (!findBestSlot(botRoster, p.pos, p.positions)) return false;
+    if (p.foreign && !canPickForeign(botRoster, p.pos).ok) return false;
+    return true;
+  });
+
+  if (!avail.length) return;
+
+  // 포지션 희소성 우선: 아직 못 채운 슬롯 포지션 우선 픽
+  const emptySlots = SLOTS.filter(s => !botRoster[s.id] && s.group !== 'bench');
+  const neededPos  = new Set(emptySlots.map(s => s.pos));
+
+  let pick = avail.find(p => {
+    const allPos = p.positions || [p.pos];
+    return allPos.some(pp => neededPos.has(pp));
+  }) || avail[0];
+
+  const slot = findBestSlot(botRoster, pick.pos, pick.positions);
+  if (!slot) return;
+
+  const {currentPickIdx, draftOrder} = A.draftInfo;
+  const N = Object.keys(A.draftTeams).length;
+  const newIdx = currentPickIdx + 1;
+
+  const updates = {};
+  updates[`leagues/${A.leagueId}/picks/${currentPickIdx}`] = {
+    teamId: botTeamId, playerId: pick.id, slotId: slot.id,
+    playerName: pick.name, playerTeam: pick.team, playerPos: pick.pos,
+    timestamp: Date.now(),
+  };
+  updates[`leagues/${A.leagueId}/teams/${botTeamId}/roster/${slot.id}`] = {
+    name: pick.name, team: pick.team, pos: pick.pos,
+    positions: pick.positions||[pick.pos], no: pick.no, foreign: pick.foreign,
+  };
+  updates[`leagues/${A.leagueId}/info/currentPickIdx`] = newIdx;
+  if (newIdx >= 25 * N) {
+    updates[`leagues/${A.leagueId}/info/status`] = 'season';
+  }
+  await db.update('', updates);
+}
+
+async function confirmPick() {
+  if (!A.selectedPlayer || !isMyTurn()) return;
+  const p    = A.selectedPlayer;
+  const slot = findBestSlot(A.localRoster, p.pos, p.positions);
+  if (!slot) { notify('빈 슬롯이 없습니다', 'err'); return; }
+  if (p.foreign) {
+    const check = canPickForeign(A.localRoster, p.pos);
+    if (!check.ok) { notify(check.msg, 'err'); return; }
+  }
+
+  const {currentPickIdx, draftOrder} = A.draftInfo;
+  const n = Object.keys(A.draftTeams).length;
+  const newIdx = currentPickIdx + 1;
+
+  // Firebase에 저장
+  const updates = {};
+  updates[`leagues/${A.leagueId}/picks/${currentPickIdx}`] = {
+    teamId: A.userId, playerId: p.id, slotId: slot.id,
+    playerName: p.name, playerTeam: p.team, playerPos: p.pos,
+    timestamp: Date.now(),
+  };
+  updates[`leagues/${A.leagueId}/teams/${A.userId}/roster/${slot.id}`] = {
+    name:p.name, team:p.team, pos:p.pos,
+    positions:p.positions||[p.pos], no:p.no, foreign:p.foreign
+  };
+  updates[`leagues/${A.leagueId}/info/currentPickIdx`] = newIdx;
+
+  if (newIdx >= 25 * n) {
+    updates[`leagues/${A.leagueId}/info/status`] = 'season';
+  }
+
+  await db.update('', updates);
+  A.selectedPlayer = null;
+  document.getElementById('sel-display').style.display = 'none';
+  document.getElementById('confirm-btn').disabled = true;
+  clearTimer();
+}
+
+function renderLog() {
+  if (A.rpTab !== 'log') return;
+  const picks = Object.values(A.draftPicks).sort((a,b)=>b.timestamp-a.timestamp).slice(0,30);
+  document.getElementById('rp-log-content').innerHTML = picks.map(pick => {
+    const team = A.draftTeams?.[pick.teamId];
+    const isMe = pick.teamId === A.userId;
+    return `<div class="log-item ${isMe?'log-mine':'log-pick'}">
+      ${team?.emoji||'⚾'} <strong>${team?.name||'팀'}</strong> → ${pick.playerName||''} <span style="color:var(--snow4)">(${pick.playerPos||''})</span>
+    </div>`;
+  }).join('') || '<div style="padding:12px;color:var(--snow4);font-size:12px">아직 지명이 없습니다</div>';
+}
+
+function renderRpTeams() {
+  if (A.rpTab !== 'teams') return;
+  const teams = Object.entries(A.draftTeams||{});
+  document.getElementById('rp-teams-content').innerHTML = teams.map(([tid,t]) => {
+    const rosterCount = Object.keys(t.roster||{}).length;
+    return `<div style="padding:8px;border-radius:8px;background:var(--bg3);margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+        <span>${t.emoji}</span>
+        <span style="font-weight:600;color:${tid===A.userId?'var(--blue)':'var(--snow)'}">${t.name}</span>
+        <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--snow3)">${rosterCount}/25</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setRpTab(tab, el) {
+  A.rpTab = tab;
+  document.querySelectorAll('.rtab-item').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('rp-log-content').style.display   = tab==='log'?'block':'none';
+  document.getElementById('rp-teams-content').style.display = tab==='teams'?'block':'none';
+  if(tab==='log') renderLog();
+  else renderRpTeams();
+}
+
+// ── 유틸 함수들 ───────────────────────────────────────────────────
+function findBestSlot(roster, playerPos, playerPositions) {
+  const allPos = playerPositions || [playerPos];
+  for (const s of SLOTS) {
+    if (roster[s.id]) continue;
+    const compat = COMPAT[s.pos] || [];
+    if (allPos.some(pp => compat.includes(pp))) return s;
+  }
+  return null;
+}
+function countForeign(roster) { return Object.values(roster).filter(p=>p&&p.foreign).length; }
+function countForeignByType(roster, type) {
+  return Object.values(roster).filter(p=>p&&p.foreign&&(p.pos==='P'?'pitcher':'hitter')===type).length;
+}
+function canPickForeign(roster, pos) {
+  if (countForeign(roster) >= 3) return {ok:false, msg:'외국인 선수는 최대 3명까지'};
+  const type = pos==='P'?'pitcher':'hitter';
+  if (countForeignByType(roster, type) >= 2) return {ok:false, msg:`외국인 ${type==='pitcher'?'투수':'야수'}는 최대 2명까지`};
+  return {ok:true};
+}
+function getPosColor(pos) {
+  if (pos==='P')  return 'rgba(61,142,240,.25)';
+  if (pos==='C')  return 'rgba(245,166,35,.25)';
+  if (['1B','2B','3B','SS','IF'].includes(pos)) return 'rgba(240,82,82,.2)';
+  if (['LF','CF','RF','OF'].includes(pos)) return 'rgba(16,201,140,.2)';
+  return 'rgba(110,123,153,.2)';
+}
+function getPosTextColor(pos) {
+  if (pos==='P')  return '#7cb8ff';
+  if (pos==='C')  return '#fcd34d';
+  if (['1B','2B','3B','SS','IF'].includes(pos)) return '#fca5a5';
+  if (['LF','CF','RF','OF'].includes(pos)) return '#6ee7b7';
+  return '#9ca3af';
+}
+function getPosClass(pos) {
+  if (pos==='P')  return 'pos-p';
+  if (pos==='C')  return 'pos-c';
+  if (['1B','2B','3B','SS','IF'].includes(pos)) return 'pos-if';
+  if (['LF','CF','RF','OF'].includes(pos)) return 'pos-of';
+  return 'pos-ut';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 시즌 운영
+// ═══════════════════════════════════════════════════════════════════
+function enterSeason() {
+  showScreen('season');
+  loadSeasonData();
+  // 자정 자동 갱신 스케줄
+  scheduleMidnight();
+}
+
+async function loadSeasonData() {
+  await loadStats();
+  await loadStandings();
+  renderStandings();
+  renderRosterPage();
+  document.getElementById('live-dot').style.display = 'inline-block';
+}
+
+async function loadStats() {
+  const cfg = loadFbConfig();
+  const url = cfg.statsUrl || A.statsUrl;
+  try {
+    const r = await fetch(url+'?t='+Date.now(), {signal:AbortSignal.timeout(8000)});
+    if (r.ok) {
+      const d = await r.json();
+      if (d.players) {
+        A.stats = d.players;
+        const lu = document.getElementById('last-update-tag');
+        if(lu) lu.textContent = '마지막 갱신: ' + (d.date||d.scraped||'').slice(0,10);
+      }
+    }
+  } catch(e) {}
+}
+
+async function loadStandings() {
+  if (!FB || !A.leagueId) return;
+  const hist = await db.get(`leagues/${A.leagueId}/rankHistory`);
+  if (hist) A.rankHistory = hist;
+  const teams = await db.get(`leagues/${A.leagueId}/teams`);
+  if (teams) A.draftTeams = teams;
+}
+
+async function refreshStandings() {
+  notify('순위 갱신 중...', 'info');
+  await loadStats();
+  const sorted = await calcAndSaveStandings();
+  if (sorted) {
+    A.standings = sorted;
+    renderStandings();
+    renderHistoryPage();
+    notify(`✅ 순위 갱신 완료`);
+  }
+}
+
+async function calcAndSaveStandings() {
+  if (!A.draftTeams || !Object.keys(A.stats).length) return null;
+  const teamEntries = Object.entries(A.draftTeams);
+  const N = teamEntries.length;
+  const today = new Date().toISOString().slice(0,10);
+
+  const ROTO_CATS = [
+    {k:'r',lb:false},{k:'hr',lb:false},{k:'rbi',lb:false},{k:'sb',lb:false},
+    {k:'avg',lb:false},{k:'ops',lb:false},{k:'bb',lb:false},
+    {k:'pip',lb:false},{k:'pw',lb:false},{k:'sv',lb:false},{k:'pso',lb:false},
+    {k:'hld',lb:false},{k:'era',lb:true},{k:'whip',lb:true},
+  ];
+
+  const rows = teamEntries.map(([tid, team]) => {
+    const roster = Object.values(team.roster||{});
+    const cats = calcRotoStats(roster);
+    const pts  = calcYahooPoints(roster);
+    return { tid, name:team.name, emoji:team.emoji, isMe:tid===A.userId, cats, pts, rotoTotal:0, catRanks:{}, rotoHitter:0, rotoPitcher:0 };
+  });
+
+  // 카테고리별 순위 점수
+  ROTO_CATS.forEach(cat => {
+    const vals = rows.map(r=>r.cats[cat.k]||0);
+    const sorted = [...vals].sort((a,b)=>cat.lb?a-b:b-a);
+    rows.forEach(r => {
+      const v = r.cats[cat.k]||0;
+      const fi=sorted.indexOf(v), li=sorted.lastIndexOf(v);
+      const score = ((N-fi)+(N-li))/2;
+      r.catRanks[cat.k] = {value:v, score};
+      r.rotoTotal += score;
+      const isHitter = ['r','hr','rbi','sb','avg','ops','bb'].includes(cat.k);
+      if(isHitter) r.rotoHitter += score; else r.rotoPitcher += score;
+    });
+  });
+
+  rows.sort((a,b)=>b.rotoTotal-a.rotoTotal);
+  rows.forEach((r,i)=>{ r.rank=i+1; });
+
+  // Firebase에 저장
+  if (FB) {
+    const updates = {};
+    rows.forEach(r => {
+      updates[`leagues/${A.leagueId}/standings/${today}/${r.tid}`] = {
+        rank:r.rank, rotoTotal:Math.round(r.rotoTotal*10)/10, pts:r.pts,
+      };
+      updates[`leagues/${A.leagueId}/rankHistory/${r.tid}/${today}`] = {
+        rank:r.rank, rotoTotal:Math.round(r.rotoTotal*10)/10,
+      };
+    });
+    try { await db.update('', updates); } catch(e){}
+
+    // 히스토리 로드
+    const hist = await db.get(`leagues/${A.leagueId}/rankHistory`);
+    if (hist) A.rankHistory = hist;
+  }
+
+  return rows;
+}
+
+function calcRotoStats(roster) {
+  let r=0,hr=0,rbi=0,sb=0,ab=0,h=0,bb=0,sf=0,hbp=0,tb=0;
+  let pip=0,pw=0,sv=0,hld=0,pso=0,per=0,ph_a=0,pbb_a=0;
+  roster.forEach(p => {
+    const st = A.stats[p.name+'_'+p.team];
+    if(!st) return;
+    if(st.type==='hitter') {
+      r+=st.r||0; hr+=st.hr||0; rbi+=st.rbi||0; sb+=st.sb||0;
+      ab+=st.ab||0; h+=st.h||0; bb+=st.bb||0; sf+=st.sf||0; hbp+=st.hbp||0;
+      const h2=st.h2||0,h3=st.h3||0,hr2=st.hr||0;
+      tb += Math.max(0,h-h2-h3-hr2) + h2*2 + h3*3 + hr2*4;
+    } else {
+      pip+=st.ip||0; pw+=st.w||0; sv+=st.sv||0; hld+=st.hld||0;
+      pso+=st.so||0; per+=st.er||0; ph_a+=st.h_a||0; pbb_a+=st.bb_a||0;
+    }
+  });
+  const den=ab+bb+hbp+sf;
+  const avg = ab>0?Math.round(h/ab*1000)/1000:0;
+  const obp = den>0?(h+bb+hbp)/den:0;
+  const slg = ab>0?tb/ab:0;
+  const ops = Math.round((obp+slg)*1000)/1000;
+  const era = pip>0?Math.round(per*9/pip*100)/100:99.99;
+  const whip= pip>0?Math.round((pbb_a+ph_a)/pip*100)/100:99.99;
+  return {r,hr,rbi,sb,avg,ops,bb,pip,pw,sv:sv+hld,hld,pso,era,whip};
+}
+
+function calcYahooPoints(roster) {
+  let total=0;
+  roster.forEach(p=>{
+    const st=A.stats[p.name+'_'+p.team];
+    if(!st) return;
+    if(st.type==='hitter'){
+      const h1b=Math.max(0,(st.h||0)-(st.h2||0)-(st.h3||0)-(st.hr||0));
+      total+=h1b*2.9+(st.h2||0)*5.2+(st.h3||0)*7.8+(st.hr||0)*10.4
+            +(st.r||0)*1.9+(st.rbi||0)*1.9+(st.sb||0)*4.2+(st.bb||0)*1.9+(st.so||0)*-0.9;
+    } else {
+      const iw=Math.floor(st.ip||0),ifrac=Math.round(((st.ip||0)-iw)*10);
+      total+=(iw*3+(ifrac<=2?ifrac:3))*1+(st.so||0)*2+(st.w||0)*8+(st.sv||0)*5+(st.hld||0)*4+(st.er||0)*-3+(st.h_a||0)*-0.6+(st.bb_a||0)*-1;
+    }
+  });
+  return Math.round(total*10)/10;
+}
+
+// ── 순위표 렌더 ────────────────────────────────────────────────────
+async function renderStandings() {
+  const sorted = await calcAndSaveStandings();
+  if (!sorted) {
+    document.getElementById('standings-hitter').innerHTML = '<div style="padding:20px;color:var(--snow3);text-align:center">스탯 로드 중...</div>';
+    return;
+  }
+  A.standings = sorted;
+  const N = sorted.length;
+  const rankEmoji = ['🥇','🥈','🥉','4위','5위','6위','7위','8위','9위','10위'];
+  const fmt = (k,v) => ['avg','ops'].includes(k)?v.toFixed(3):['era','whip'].includes(k)?(v>=99?'—':v.toFixed(2)):(k==='pip'?(()=>{const w=Math.floor(v),f=Math.round((v-w)*10);return f?w+'.'+f:w+'';})():String(v));
+
+  const hitterCats = [{k:'r',l:'R'},{k:'hr',l:'HR'},{k:'rbi',l:'RBI'},{k:'sb',l:'SB'},{k:'avg',l:'AVG'},{k:'ops',l:'OPS'},{k:'bb',l:'BB'}];
+  const pitchCats  = [{k:'pip',l:'IP'},{k:'pw',l:'W'},{k:'sv',l:'SV'},{k:'hld',l:'HLD'},{k:'pso',l:'K'},{k:'era',l:'ERA↓'},{k:'whip',l:'WHIP↓'}];
+
+  const makeTable = (cats, scoreKey, title) => {
+    const sortedByCat = [...sorted].sort((a,b)=>(b[scoreKey]||0)-(a[scoreKey]||0));
+    const hdr = cats.map(c=>`<th style="text-align:center;font-size:10px;padding:5px 4px;white-space:nowrap">${c.l}</th>`).join('');
+    const rows = sortedByCat.map((t,i)=>{
+      const rankColor = i===0?'var(--gold)':i===1?'#d1d5db':i===2?'#cd7c2e':'var(--snow3)';
+
+      // 이전 순위 대비 변동
+      const hist = A.rankHistory[t.tid] || {};
+      const dates = Object.keys(hist).sort();
+      let changeHtml = '';
+      if(dates.length >= 2) {
+        const prevRank = hist[dates[dates.length-2]]?.rank;
+        const curRank  = t.rank;
+        if(prevRank && prevRank !== curRank) {
+          const diff = prevRank - curRank;
+          changeHtml = diff>0 ? `<span class="rank-change rank-up">▲${diff}</span>` : `<span class="rank-change rank-dn">▼${Math.abs(diff)}</span>`;
+        } else if(prevRank) {
+          changeHtml = `<span class="rank-change rank-eq">—</span>`;
+        }
+      }
+
+      const cells = cats.map(c=>{
+        const cr=t.catRanks[c.k]; if(!cr) return '<td style="text-align:center;color:var(--snow4)">—</td>';
+        const pct=cr.score/N; const col=pct>0.65?'var(--green)':pct>0.35?'var(--snow2)':'var(--red)';
+        return `<td style="text-align:center;padding:5px 3px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:${col}">${fmt(c.k,cr.value||0)}</div><div style="font-size:9px;color:${col}">${cr.score}pt</div></td>`;
+      }).join('');
+
+      return `<tr ${t.isMe?'style="background:rgba(61,142,240,.07)"':''}>
+        <td style="font-size:14px;font-weight:700;color:${rankColor};padding:7px 10px">${rankEmoji[i]||i+1+'위'}${changeHtml}</td>
+        <td style="padding:7px 10px"><div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:16px">${t.emoji||'⚾'}</span>
+          <div><div style="font-size:13px;font-weight:${t.isMe?700:500};color:${t.isMe?'var(--blue)':'var(--snow)'}">${t.name}${t.isMe?' (나)':''}</div></div>
+        </div></td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:${t.isMe?'var(--green)':'var(--snow)'};padding:7px 10px">${(t[scoreKey]||0).toFixed(1)}</td>
+        ${cells}
+      </tr>`;
+    }).join('');
+
+    return `<div style="font-size:11px;color:${scoreKey==='rotoHitter'?'var(--blue)':'var(--amber)'};text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">${title}</div>
+      <div style="overflow-x:auto"><table class="standings-tbl" style="min-width:500px">
+        <thead><tr><th>#</th><th>팀</th><th style="text-align:right">점수</th>${hdr}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+  };
+
+  document.getElementById('standings-hitter').innerHTML = makeTable(hitterCats, 'rotoHitter', '⚔️ 타자 카테고리');
+  document.getElementById('standings-pitcher').innerHTML = makeTable(pitchCats, 'rotoPitcher', '🔥 투수 카테고리');
+  document.getElementById('standings-title').textContent = `순위표 · ${N}팀 리그`;
+}
+
+// ── 로스터 페이지 ──────────────────────────────────────────────────
+function renderRosterPage() {
+  const myTeam = A.draftTeams?.[A.userId];
+  if(!myTeam) { document.getElementById('roster-content').innerHTML='<div style="color:var(--snow3)">로스터 없음</div>'; return; }
+  const roster = Object.values(myTeam.roster||{});
+  const groups=[
+    {label:'투수',filter:p=>p.pos==='P'},
+    {label:'포수',filter:p=>p.pos==='C'},
+    {label:'내야수',filter:p=>['1B','2B','3B','SS','IF'].includes(p.pos)},
+    {label:'외야수',filter:p=>['LF','CF','RF','OF'].includes(p.pos)},
+    {label:'기타',filter:p=>!['P','C','1B','2B','3B','SS','IF','LF','CF','RF','OF'].includes(p.pos)},
+  ];
+  document.getElementById('roster-content').innerHTML = groups.map(g=>{
+    const players=roster.filter(g.filter);
+    if(!players.length) return '';
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="card-title">${g.label} (${players.length})</div>
+      <table class="standings-tbl">
+        <thead><tr><th>포지션</th><th>선수</th><th>팀</th><th>스탯</th><th style="text-align:right">기여점수</th></tr></thead>
+        <tbody>${players.map(p=>{
+          const st=A.stats[p.name+'_'+p.team];
+          const pts=st?calcYahooPoints([p]):0;
+          const statStr=st?(st.type==='hitter'?`AVG${(st.avg||0).toFixed(3)} HR${st.hr||0} RBI${st.rbi||0}`:`ERA${(st.era||0).toFixed(2)} K${st.so||0} W${st.w||0}`):'-';
+          const posClass=getPosClass(p.pos);
+          return `<tr>
+            <td><span class="pos-tag ${posClass}">${p.pos}</span></td>
+            <td style="font-weight:500">${p.name}</td>
+            <td style="color:var(--snow3);font-size:12px">${p.team}</td>
+            <td style="font-size:12px;color:var(--snow2)">${statStr}</td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${pts>0?'var(--green)':'var(--snow3)'}">${pts.toFixed(1)}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`;
+  }).join('');
+}
+
+// ── 순위 변동 차트 ─────────────────────────────────────────────────
+async function renderHistoryPage() {
+  if (!A.draftTeams || !Object.keys(A.rankHistory).length) {
+    document.getElementById('history-table').innerHTML = '<div style="padding:16px;color:var(--snow3);text-align:center">아직 순위 기록이 없습니다.<br>매일 갱신 버튼을 누르면 기록이 쌓입니다.</div>';
+    return;
+  }
+
+  const teams = Object.entries(A.draftTeams);
+  const allDates = [...new Set(
+    Object.values(A.rankHistory).flatMap(t=>Object.keys(t))
+  )].sort();
+
+  // 차트 그리기
+  const canvas = document.getElementById('rank-chart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 600;
+  const H = 180;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const N = teams.length;
+  const PAD = {t:16,r:20,b:30,l:36};
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+
+  // 배경
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim() || '#1a2236';
+  ctx.fillRect(0,0,W,H);
+
+  // 그리드
+  ctx.strokeStyle = 'rgba(30,46,72,.8)'; ctx.lineWidth = 1;
+  for(let rank=1;rank<=N;rank++){
+    const y = PAD.t + (rank-1)/(N-1)*cH;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='rgba(99,115,150,.8)'; ctx.font='10px JetBrains Mono';
+    ctx.textAlign='right'; ctx.fillText(rank+'위', PAD.l-4, y+3);
+  }
+
+  // 날짜 레이블
+  ctx.fillStyle='rgba(99,115,150,.8)'; ctx.font='9px Noto Sans KR'; ctx.textAlign='center';
+  allDates.forEach((d,i)=>{
+    const x = PAD.l + (i/(Math.max(allDates.length-1,1)))*cW;
+    ctx.fillText(d.slice(5), x, H-PAD.b+12);
+  });
+
+  // 팀별 라인
+  const teamColors = ['#3d8ef0','#f05252','#10c98c','#f5a623','#a78bfa','#f472b6','#fb923c','#34d399'];
+  teams.forEach(([tid,team],ti)=>{
+    const hist = A.rankHistory[tid] || {};
+    const points = allDates.map((d,di)=>{
+      const rank = hist[d]?.rank;
+      if (!rank) return null;
+      const x = PAD.l + (di/(Math.max(allDates.length-1,1)))*cW;
+      const y = PAD.t + (rank-1)/(N-1)*cH;
+      return {x,y,rank};
+    }).filter(Boolean);
+
+    if(points.length < 1) return;
+    const color = team.color || teamColors[ti%teamColors.length];
+    const isMe = tid === A.userId;
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isMe ? 3 : 1.5;
+    ctx.setLineDash(isMe ? [] : [4,3]);
+    ctx.beginPath();
+    points.forEach((p,i)=>{ i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 점
+    points.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,isMe?5:3,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    });
+
+    // 팀 이름 (마지막 점 옆)
+    const last = points[points.length-1];
+    ctx.fillStyle=color; ctx.font=`${isMe?'bold ':''} 10px Noto Sans KR`; ctx.textAlign='left';
+    ctx.fillText(team.emoji+team.name, last.x+6, last.y+3);
+  });
+
+  // 테이블
+  const latestDate = allDates[allDates.length-1];
+  document.getElementById('history-table').innerHTML = `
+    <div style="font-size:11px;color:var(--snow3);margin-bottom:10px">날짜별 순위 변동</div>
+    <div style="overflow-x:auto"><table class="standings-tbl">
+      <thead><tr><th>팀</th>${allDates.map(d=>`<th style="text-align:center;font-size:10px">${d.slice(5)}</th>`).join('')}</tr></thead>
+      <tbody>${teams.map(([tid,team])=>{
+        const hist = A.rankHistory[tid]||{};
+        return `<tr ${tid===A.userId?'style="background:rgba(61,142,240,.07)"':''}>
+          <td><div style="display:flex;align-items:center;gap:6px"><span>${team.emoji}</span><span style="font-size:12px;font-weight:${tid===A.userId?700:400}">${team.name}</span></div></td>
+          ${allDates.map(d=>{
+            const rank=hist[d]?.rank;
+            if(!rank) return '<td style="text-align:center;color:var(--snow4)">—</td>';
+            const color=rank===1?'var(--gold)':rank===2?'#d1d5db':rank===3?'#cd7c2e':'var(--snow)';
+            return `<td style="text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;color:${color}">${rank}</td>`;
+          }).join('')}
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+}
+
+// ── 시즌 네비 ──────────────────────────────────────────────────────
+function seasonNav(page, el) {
+  document.querySelectorAll('.spage').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.snav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('sp-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  if(page==='standings') renderStandings();
+  if(page==='roster')    renderRosterPage();
+  if(page==='scores')    renderScoresPage();
+  if(page==='history')   renderHistoryPage();
+}
+
+function renderScoresPage() {
+  if(!A.standings) { document.getElementById('scores-content').innerHTML='<div style="color:var(--snow3)">순위표 먼저 갱신하세요</div>'; return; }
+  const me = A.standings.find(t=>t.isMe);
+  if(!me) return;
+  document.getElementById('scores-content').innerHTML = `
+    <div class="g4" style="margin-bottom:16px">
+      <div class="metric"><div class="metric-v" style="color:var(--gold)">${me.rank}위</div><div class="metric-l">현재 순위</div></div>
+      <div class="metric"><div class="metric-v" style="color:var(--cyan)">${me.rotoTotal.toFixed(1)}</div><div class="metric-l">로티세리 총점</div></div>
+      <div class="metric"><div class="metric-v" style="color:var(--blue)">${me.rotoHitter.toFixed(1)}</div><div class="metric-l">타자 점수</div></div>
+      <div class="metric"><div class="metric-v" style="color:var(--amber)">${me.rotoPitcher.toFixed(1)}</div><div class="metric-l">투수 점수</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">선수별 기여도</div>
+      <table class="standings-tbl">
+        <thead><tr><th>선수</th><th>팀</th><th>포지션</th><th style="text-align:right">Yahoo 포인트</th></tr></thead>
+        <tbody>${(Object.values(A.draftTeams?.[A.userId]?.roster||{}))
+          .map(p=>({...p,pts:calcYahooPoints([p])}))
+          .sort((a,b)=>b.pts-a.pts)
+          .map(p=>`<tr>
+            <td style="font-weight:500">${p.name}</td>
+            <td style="color:var(--snow3);font-size:12px">${p.team}</td>
+            <td><span class="pos-tag ${getPosClass(p.pos)}">${p.pos}</span></td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${p.pts>0?'var(--green)':p.pts<0?'var(--red)':'var(--snow3)'}">${p.pts.toFixed(1)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── 자정 자동 갱신 ─────────────────────────────────────────────────
+let _midnightTimer = null;
+function scheduleMidnight() {
+  if(_midnightTimer) clearTimeout(_midnightTimer);
+  const now  = new Date();
+  const next = new Date(now);
+  next.setHours(0,1,0,0);
+  if(next<=now) next.setDate(next.getDate()+1);
+  const ms = next-now;
+  console.log('[KBO Fantasy] 다음 자동 갱신:', next.toLocaleString());
+  _midnightTimer = setTimeout(async ()=>{
+    await refreshStandings();
+    scheduleMidnight();
+  }, ms);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 정리
+// ═══════════════════════════════════════════════════════════════════
+function cleanup() {
+  A.unsubscribes.forEach(fn=>fn());
+  A.unsubscribes=[];
+  clearTimer();
+}
+
+</script>
+</body>
+</html>
